@@ -1,11 +1,24 @@
 import "./App.css";
-import Layout from "./components/layout/layout";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout/layout";
+import Booking from "./components/Booking/Booking";
+import MyBooking from "./components/MyBooking/MyBooking";
 
 function App() {
   return (
-    <>
-      <Layout>{/* เนื้อหาของแอปพลิเคชันจะมาอยู่ที่นี่ */}</Layout>
-    </>
+    <Routes>
+      <Route
+        path="/*"
+        element={
+          <Layout>
+            <Routes>
+              <Route index element={<Booking />} />
+              <Route path="my-bookings" element={<MyBooking />} />
+            </Routes>
+          </Layout>
+        }
+      />
+    </Routes>
   );
 }
 
