@@ -24,3 +24,19 @@
   --color-mint-light: #e6fffb; /* อ่อน (Lightest) */
   --font-kanit: "Kanit", sans-serif;
 }
+
+.custom-booking-input.ant-input-affix-wrapper {
+  border: none !important; /* ปิดขอบทุกด้าน */
+  border-bottom: 2px solid #ffc53d !important; /* เส้นใต้สีเหลือง (Tailwind yellow-500) */
+  border-radius: 0 !important;
+  padding-bottom: 8px !important; /* เพิ่มระยะห่างระหว่างตัวหนังสือกับเส้นใต้ */
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* ปรับสไตล์ Placeholder ให้ตรงตามรูป (ตัวหนาและดำ) */
+.custom-booking-input .ant-input::placeholder {
+  color: #000000 !important; /* สีดำตามรูป */
+  font-weight: 600 !important; /* ตัวหนา */
+  font-size: 1.5rem !important; /* ขนาดใหญ่ */
+}

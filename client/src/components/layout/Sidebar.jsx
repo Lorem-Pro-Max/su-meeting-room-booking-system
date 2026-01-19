@@ -5,7 +5,7 @@ import Logout from "../../assets/icon/logout.svg";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 
-export default function Sidebar({ isMenuOpen }) {
+function Sidebar({ isMenuOpen }) {
   const location = useLocation();
 
   return (
@@ -32,7 +32,7 @@ export default function Sidebar({ isMenuOpen }) {
 
         {/* เมนูที่ 2 */}
         <NavLink
-          to="/my-bookings"
+          to="/my-booking"
           className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${
             isMenuOpen ? "px-4 justify-start" : "justify-center"
           }`}
@@ -48,15 +48,18 @@ export default function Sidebar({ isMenuOpen }) {
 
       {/* เมนูล่าง (Logout) */}
       <div className="w-full px-3">
-        <div
+        <NavLink
+        to="/login"
           className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${
             isMenuOpen ? "px-4 justify-start" : "justify-center"
           }`}
         >
           <img src={Logout} className="w-[18px] h-[18px]" alt="logout" />
           {isMenuOpen && <p className="text-sm font-medium">Logout</p>}
-        </div>
+        </NavLink>
       </div>
     </div>
   );
 }
+
+export default Sidebar

@@ -1,8 +1,9 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout/layout";
-import Booking from "./components/Booking/Booking";
-import MyBooking from "./components/MyBooking/MyBooking";
+import MyBooking from "./pages/MyBooking";
+import Login from "./pages/login";
+import Booking from "./pages/Booking";
 
 function App() {
   return (
@@ -13,11 +14,12 @@ function App() {
           <Layout>
             <Routes>
               <Route index element={<Booking />} />
-              <Route path="my-bookings" element={<MyBooking />} />
+              <Route path="my-booking" element={<MyBooking />} />
             </Routes>
           </Layout>
         }
       />
+      <Route path="login" element={<Login />} />
     </Routes>
   );
 }

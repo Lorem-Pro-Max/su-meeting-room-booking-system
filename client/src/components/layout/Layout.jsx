@@ -2,7 +2,7 @@ import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { useState } from "react";
 
-export default function Layout({ children }) {
+function Layout({ children }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleMenuClick = () => {
     if (isMenuOpen) {
@@ -17,10 +17,10 @@ export default function Layout({ children }) {
       <Navbar handleMenuClick={handleMenuClick} />
       <div className="flex flex-1">
         <Sidebar isMenuOpen={isMenuOpen} />
-        <main className="flex-1 bg-[#F8FAFC] p-6 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 bg-[#F8FAFC]  overflow-y-auto">{children}</main>
       </div>
     </div>
   );
 }
+
+export default Layout
