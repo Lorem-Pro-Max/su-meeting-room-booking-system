@@ -1,7 +1,9 @@
 import Icon from "@ant-design/icons";
-import Booking from "../../assets/icon/booking.svg";
+import booking from "../../assets/icon/booking.svg";
+
 
 const wrapIcon = (Component) => (props) =>
   <Icon component={Component} {...props} />;
 
-export const BookingIcon = wrapIcon(Booking);
+export const BookingIcon = wrapIcon(booking);
+export const BuildingIcon = wrapIcon(BuildingSvg);

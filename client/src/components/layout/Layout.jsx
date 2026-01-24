@@ -13,11 +13,11 @@ function Layout({ children }) {
     }
   };
   return (
-    <div className="min-h-screen flex flex-col font-kanit bg-[#F5F5F5]">
+    <div className="h-screen flex flex-col font-kanit">
       <Navbar handleMenuClick={handleMenuClick} />
-      <div className="flex flex-1">
+      <div className="h-full flex overflow-hidden">
         <Sidebar isMenuOpen={isMenuOpen} />
-        <main className="flex-1 bg-[#F8FAFC]  overflow-y-auto">{children}</main>
+        <main className="flex-1 bg-[#F5F5F5]  overflow-y-auto">{children}</main>
       </div>
     </div>
   );

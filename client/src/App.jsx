@@ -1,9 +1,10 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout/layout";
+import Layout from "./components/layout/Layout";
 import MyBooking from "./pages/MyBooking";
 import Login from "./pages/login";
 import Booking from "./pages/Booking";
+import { ConfigProvider } from "antd";
 
 function App() {
   return (
@@ -11,16 +12,25 @@ function App() {
       <Route
         path="/*"
         element={
-          <Layout>
-            <Routes>
-              <Route index element={<Booking />} />
-              <Route path="my-booking" element={<MyBooking />} />
-            </Routes>
-          </Layout>
+          <ConfigProvider
+            theme={{
+              token: {
+                fontFamily: "Kanit, sans-serif",
+                colorPrimary: '#13c2c2',
+              },
+            }}
+          >
+            <Layout>
+              <Routes>
+                <Route index element={<Booking />} />
+                <Route path="my-booking" element={<MyBooking />} />
+              </Routes>
+            </Layout>
+          </ConfigProvider>
         }
       />
-      <Route path="login" element={<Login />} />
-    </Routes>
+      < Route path="login" element={< Login />} />
+    </Routes >
   );
 }
 

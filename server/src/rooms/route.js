@@ -1,8 +1,8 @@
-import { Router } from "express";
-import { getAllRoomsController } from "./controller.js";
+import express from "express";
+import { getAllRooms } from "./controller.js";
 
-const roomRouter = Router();
+const router = express.Router();
 
-roomRouter.get("/", getAllRoomsController);
+router.get("/", getAllRooms);
 
-export default roomRouter;
+export default router;

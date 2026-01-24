@@ -16,5 +16,4 @@ export async function findAllRooms() {
 `;
 
 return rooms;
-
-  }
+}

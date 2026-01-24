@@ -1,8 +1,8 @@
-import { getAllRooms } from "./service.js";
+import { findAllRooms } from "./repository.js";
 
-export async function getAllRoomsController(req, res, next) {
+export async function getAllRooms(req, res, next) {
   try {
-    const rooms = await getAllRooms();
+    const rooms = await findAllRooms();
     res.json(rooms);
   } catch (err) {
     next(err);

@@ -3,6 +3,7 @@ import { Card, Row, Col, Tabs } from "antd";
 import { EnvironmentOutlined } from "@ant-design/icons";
 import { useMemo } from "react";
 
+
 export default function RoomsByFloorTabs({
   roomsGroupedByFloor,
   tempSelectedRoom,
@@ -24,7 +25,7 @@ export default function RoomsByFloorTabs({
         key: floorKey,
         label: `ชั้นที่ ${floorKey}`,
         children: (
-          <div className="max-h-[450px] overflow-y-auto overflow-x-hidden p-2 bg-gray-50 rounded-xl">
+          <div className=" overflow-y-auto overflow-x-hidden p-4 bg-[#F5F5F5] rounded-2xl">
             <Row gutter={[12, 12]}>
               {roomsOnThisFloor.map((roomItem) => {
                 const roomId = roomItem.id ?? `${roomItem.floor}-${roomItem.title ?? roomItem.name}`;
@@ -34,11 +35,17 @@ export default function RoomsByFloorTabs({
                 const isSelected = tempSelectedRoom?.id === roomItem.id;
 
                 return (
-                  <Col span={8} key={roomId}>
-                    <Card
-                      className={`room-item-card ${isSelected ? "selected" : ""}`}
+                  <Col key={roomId}
+                    xs={24}
+                    sm={12}
+                    md={12}
+                    lg={8}>
+                    <div
+                      className={`p-4 rounded-2xl bg-white shadow-lg hover:ring-2 hover:ring-mint-light hover:cursor-pointer ${isSelected
+                        ? "ring-1 ring-mint-dark ring-offset-1"
+                        : null
+                        }`}
                       onClick={() => onSelectTempRoom(roomItem)}
-                      style={{ width: "100%" }}
                     >
                       <div className="flex gap-3">
                         <div className="w-10 h-10 bg-teal-400 rounded-lg flex items-center justify-center text-white shrink-0">
@@ -49,15 +56,15 @@ export default function RoomsByFloorTabs({
                           <div className="font-bold text-sm leading-tight truncate">
                             {roomName}
                           </div>
-                          <div className="text-[10px] text-gray-500">ชั้น {floorKey}</div>
+                          <div className="text-[14px] text-gray-500">ชั้น {floorKey}</div>
                           {buildingName ? (
-                            <div className="text-[9px] text-gray-400 mt-1 line-clamp-2">
+                            <div className="text-[12px] text-gray-400 mt-1 line-clamp-2">
                               {buildingName}
                             </div>
                           ) : null}
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   </Col>
                 );
               })}

@@ -10,21 +10,20 @@ function Sidebar({ isMenuOpen }) {
 
   return (
     <div
-      className={`py-6 flex flex-col justify-between items-center bg-white transition-all duration-300 ${
-        isMenuOpen ? "w-66" : "w-18"
-      }`}
+      className={`hidden md:flex h-full py-6 flex-col justify-between items-center bg-white transition-all duration-300
+      ${isMenuOpen ? "w-66" : "w-18"}
+    `}
     >
       <div className="flex flex-col gap-4 w-full px-3">
         {/* เมนูที่ 1 */}
         <NavLink
           to="/"
-          className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${
-            isMenuOpen ? "px-4 justify-start" : "justify-center"
-          }`}
+          className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
+            }`}
         >
           <img src={Booking} className="w-[18px] h-[18px]" alt="booking" />
           {isMenuOpen && (
-            <p className="text-sm font-medium whitespace-nowrap">
+            <p className="text-sm font-medium whitespace-nowrap pt-4">
               จองห้องเรียน/ห้องประชุม
             </p>
           )}
@@ -33,13 +32,12 @@ function Sidebar({ isMenuOpen }) {
         {/* เมนูที่ 2 */}
         <NavLink
           to="/my-booking"
-          className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${
-            isMenuOpen ? "px-4 justify-start" : "justify-center"
-          }`}
+          className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
+            }`}
         >
           <img src={History} className="w-[18px] h-[18px]" alt="history" />
           {isMenuOpen && (
-            <p className="text-sm font-medium whitespace-nowrap">
+            <p className="text-sm font-medium whitespace-nowrap pt-4">
               การจองของฉัน
             </p>
           )}
@@ -49,13 +47,12 @@ function Sidebar({ isMenuOpen }) {
       {/* เมนูล่าง (Logout) */}
       <div className="w-full px-3">
         <NavLink
-        to="/login"
-          className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${
-            isMenuOpen ? "px-4 justify-start" : "justify-center"
-          }`}
+          to="/login"
+          className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
+            }`}
         >
           <img src={Logout} className="w-[18px] h-[18px]" alt="logout" />
-          {isMenuOpen && <p className="text-sm font-medium">Logout</p>}
+          {isMenuOpen && <p className="text-sm font-medium pt-4">Logout</p>}
         </NavLink>
       </div>
     </div>
