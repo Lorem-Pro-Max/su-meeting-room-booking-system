@@ -7,17 +7,16 @@ import {
   Divider, ConfigProvider
 } from "antd";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import dayjs from 'dayjs';
-import { getAllRooms } from "../../services/getAllRoom";
 import RoomSelection from "./RoomSelection/RoomSelection"
 import TitleInput from "./TitleInput";
 import TimeInput from "./TimeInput";
 import BookingCard from "./BookingModal/BookingCard";
 
 
-function BookingForm({ date, setDate, bookings }) {
-  const [rooms, setRooms] = useState([])
+function BookingForm({ date, setDate, bookings, rooms }) {
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isError, setIsError] = useState(false)
@@ -30,11 +29,6 @@ function BookingForm({ date, setDate, bookings }) {
     startTime: '',
     endTime: ''
   });
-
-  useEffect(() => {
-    getAllRooms()
-      .then(setRooms)
-  }, []);
 
   return (
     <div className="flex flex-col justify-between md:min-w-116 bg-white h-full">
@@ -71,7 +65,8 @@ function BookingForm({ date, setDate, bookings }) {
         </ConfigProvider>
         <Divider></Divider>
         <p>สถานะการจองห้อง</p>
-        <BookingCard bookings={bookings} />
+        <div className="max-h-80 2xl:max-h-120 overflow-y-auto overflow-x-hidden space-y-4 px-2">
+          <BookingCard bookings={bookings} /></div>
       </div>
       <div>
         <button
@@ -86,7 +81,7 @@ function BookingForm({ date, setDate, bookings }) {
           ยืนยัน
         </button>
       </div>
-    </div>
+    </div >
   );
 }
 

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-export default function useRoomsByFloor(rooms = []) {
+export default function useRoomsByFloor(rooms) {
   return useMemo(() => {
     const roomsGroupedByFloor = new Map();
 

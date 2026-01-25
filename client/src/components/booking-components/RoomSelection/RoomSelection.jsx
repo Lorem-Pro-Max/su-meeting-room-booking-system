@@ -38,15 +38,14 @@ export default function RoomSelection({
         />
         <div className="w-full flex flex-col sm:flex-row gap-2 pt-5">
           <button
-            className="w-full sm:w-1/2 rounded-lg h-10 border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+            className="w-full sm:w-1/2 rounded-lg h-10 border border-gray-300 text-gray-700 hover:bg-gray-100 transition cursor-pointer"
             onClick={() => setIsModalOpen(false)}
           >
             ยกเลิก
           </button>
-
           <button
             disabled={!tempSelectedRoom}
-            className={` w-full sm:w-1/2 rounded-lg h-10 text-white transition ${tempSelectedRoom ? "bg-mint-dark hover:bg-mint-darker" : "bg-gray-300 cursor-not-allowed"}`}
+            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom ? "bg-mint-dark hover:bg-mint-darker text-white cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
             onClick={() => {
               if (tempSelectedRoom) {
                 setSelectedRoom(tempSelectedRoom);

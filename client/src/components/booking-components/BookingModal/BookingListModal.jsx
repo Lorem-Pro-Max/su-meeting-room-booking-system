@@ -17,7 +17,9 @@ function BookingListModal({ isModalOpen, setIsModalOpen, bookings }) {
                 onCancel={handleCancel}
                 centered
             >
-                <BookingCard bookings={bookings} />
+                <div className="max-h-110 2xl:max-h-250 overflow-y-auto overflow-x-hidden space-y-4 px-2">
+                    <BookingCard bookings={bookings} />
+                </div>
             </Modal>
         </>
     );
