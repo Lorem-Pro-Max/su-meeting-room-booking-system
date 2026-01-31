@@ -1,19 +1,25 @@
 import React from 'react';
-import { Button, Form, Input } from 'antd';
+import { Button, Form, Input, message } from 'antd';
 import Logo from "../../assets/icon/logo.svg";
 import KeySvg from "../../assets/icon/key.svg"
-import {
-    UserOutlined
-} from '@ant-design/icons';
-
+import { UserOutlined } from '@ant-design/icons';
+import { loginService } from '../../services/index'
 
 
 function LoginForm() {
-    const onFinish = values => {
-        console.log('Success:', values);
-    };
-    const onFinishFailed = errorInfo => {
-        console.log('Failed:', errorInfo);
+    const handleLogin = async (values) => {
+        try {
+            const data = await loginService(values.username, values.password);
+
+            sessionStorage.setItem('accessToken', data.accessToken);
+
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            window.location.href = '/';
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || 'การเชื่อมต่อผิดพลาด';
+            console.error(errorMsg);
+        }
     };
     return (
         <div className="w-full max-w-[420px] sm:max-w-[460px] bg-white/80 backdrop-blur rounded-2xl flex flex-col p-6 sm:p-8 lg:p-10 gap-5 shadow-lg">
@@ -25,8 +31,7 @@ function LoginForm() {
             <Form
                 layout="vertical"
                 initialValues={{ remember: true }}
-                onFinish={onFinish}
-                onFinishFailed={onFinishFailed}
+                onFinish={handleLogin}
                 autoComplete="off"
             >
                 <Form.Item
@@ -34,7 +39,7 @@ function LoginForm() {
                     name="username"
                     rules={[{ required: true, message: 'Please input your username!' }]}
                 >
-                    <Input prefix={<UserOutlined style={{ color: "#D9D9D9", width: "200px" }} />} />
+                    <Input prefix={<UserOutlined style={{ color: "#D9D9D9" }} />} />
                 </Form.Item>
                 <Form.Item
                     label="password"
