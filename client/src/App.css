@@ -36,6 +36,12 @@
   font-size: 1.5rem !important; /* ขนาดใหญ่ */
 }
 
+.custom-booking-input .ant-input {
+  color: #000000 !important; /* สีดำตามรูป */
+  font-weight: 600 !important; /* ตัวหนา */
+  font-size: 1.5rem !important; /* ขนาดใหญ่ */
+}
+
 html, body, #root {
   font-family: "Kanit", sans-serif;
 }

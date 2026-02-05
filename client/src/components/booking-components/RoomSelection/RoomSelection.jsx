@@ -6,9 +6,9 @@ import useRoomByFloor from "./useRoomByFloor";
 
 export default function RoomSelection({
   isModalOpen,
-  selectedRoom,
   setIsModalOpen,
-  setSelectedRoom,
+  setFormData,
+  formData,
   rooms,
 }) {
   const [tempSelectedRoom, setTempSelectedRoom] = useState(null);
@@ -16,12 +16,16 @@ export default function RoomSelection({
   const roomsGroupedByFloor = useRoomByFloor(rooms);
 
   useEffect(() => {
-    if (isModalOpen) { setTempSelectedRoom(selectedRoom ?? null); }
-  }, [isModalOpen, selectedRoom]);
+    if (isModalOpen) { setTempSelectedRoom(formData.room ?? null); }
+  }, [isModalOpen, formData.room]);
 
   return (
     <Form.Item label={<span className="font-medium">ห้องที่ต้องการจอง</span>} required>
-      <RoomPickerCard rooms={rooms} selectedRoom={selectedRoom} onOpenModal={() => setIsModalOpen(true)} />
+      <RoomPickerCard
+        rooms={rooms}
+        formData={formData}
+        setFormData={setFormData}
+        onOpenModal={() => setIsModalOpen(true)} />
 
       <Modal
         title={<span className="text-xl font-bold font-kanit">เลือกห้องเรียน/ห้องประชุม</span>}
@@ -48,8 +52,8 @@ export default function RoomSelection({
             className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom ? "bg-mint-dark hover:bg-mint-darker text-white cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
             onClick={() => {
               if (tempSelectedRoom) {
-                setSelectedRoom(tempSelectedRoom);
                 setIsModalOpen(false);
+                setFormData((prev) => ({ ...prev, room: tempSelectedRoom }));
               }
             }}
           >

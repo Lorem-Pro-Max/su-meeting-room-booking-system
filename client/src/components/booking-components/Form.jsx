@@ -4,31 +4,43 @@ import {
   DatePicker,
   Row,
   Col,
-  Divider, ConfigProvider
+  Divider, ConfigProvider, Modal
 } from "antd";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dayjs from 'dayjs';
 import RoomSelection from "./RoomSelection/RoomSelection"
 import TitleInput from "./TitleInput";
 import TimeInput from "./TimeInput";
 import BookingCard from "./BookingModal/BookingCard";
-
+import PhoneInput from "./PhoneInput";
+import { SubmitModalBody } from "./SubmitModalBody";
 
 function BookingForm({ date, setDate, bookings, rooms }) {
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [isError, setIsError] = useState(false)
-
-  const [form, setForm] = useState({
-    title: '',
-    room_id: '',
-    date: '',
-    phone: '',
-    startTime: '',
-    endTime: ''
+  const [form] = Form.useForm();
+  const userInfo = getInitialUser()
+  const [formData, setFormData] = useState({
+    title: "",
+    userId: userInfo?.id || null,
+    userName: userInfo ? `${userInfo.firstname} ${userInfo.lastname}`.trim() : "",
+    room: null,
+    selectedDate: date,
+    phone: "",
+    startTime: null,
+    endTime: null
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isError, setIsError] = useState(false)
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false)
+
+  console.log(formData)
+
+  useEffect(() => {
+    if (date) {
+      setFormData((prev) => ({ ...prev, selectedDate: date }));
+      form.setFieldsValue({ date: date });
+    }
+  }, [date]);
 
   return (
     <div className="flex flex-col justify-between md:min-w-116 bg-white h-full">
@@ -37,18 +49,21 @@ function BookingForm({ date, setDate, bookings, rooms }) {
           theme={{
             components: {
               Form: {
-                itemMarginBottom: 8, // ปรับค่านี้ให้เล็กลงตามต้องการ (หน่วยเป็น px)
+                itemMarginBottom: 8,
               },
             },
           }}
         >
-          <Form layout="vertical" className="flex flex-col gap-2">
-            <TitleInput />
+          <Form layout="vertical" className="flex flex-col gap-2 " initialValues={{
+            user: formData.userName, // แสดงชื่อผู้จองทันที
+            date: date
+          }}>
+            <TitleInput setFormData={setFormData} />
             <RoomSelection
+              setFormData={setFormData}
+              formData={formData}
               isModalOpen={isModalOpen}
-              selectedRoom={selectedRoom}
               setIsModalOpen={setIsModalOpen}
-              setSelectedRoom={setSelectedRoom}
               rooms={rooms}
             />
             <UserInfo />
@@ -57,10 +72,10 @@ function BookingForm({ date, setDate, bookings, rooms }) {
                 <DateInput date={date} setDate={setDate} />
               </Col>
               <Col span={12}>
-                <PhoneInput />
+                <PhoneInput setFormData={setFormData} />
               </Col>
             </Row>
-            <TimeInput />
+            <TimeInput setFormData={setFormData} />
           </Form>
         </ConfigProvider>
         <Divider></Divider>
@@ -70,17 +85,28 @@ function BookingForm({ date, setDate, bookings, rooms }) {
       </div>
       <div>
         <button
-          className="w-full sm:w-1/2 h-10 border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+          className="w-full sm:w-1/2 h-10 border border-gray-300 text-gray-700 hover:bg-gray-100 transition hover:cursor-pointer"
           onClick={() => setIsModalOpen(false)}
         >
           ยกเลิก
         </button>
         <button
-          className={` w-full sm:w-1/2 h-10 text-white transition ${!isError ? "bg-mint-dark hover:bg-mint-darker" : "bg-gray-300 cursor-not-allowed"}`}
+          className={` w-full sm:w-1/2 h-10 hover:cursor-pointer !text-white transition ${!isError ? "bg-mint-dark hover:bg-mint-darker" : "bg-gray-300 cursor-not-allowed"}`}
+          onClick={() => setIsSubmitModalOpen(true)}
         >
           ยืนยัน
         </button>
       </div>
+      <Modal
+        title="รายละเอียดการจอง"
+        open={isSubmitModalOpen}
+        onOk={() => toggleModal(0, false)}
+        onCancel={() => setIsSubmitModalOpen(false)}
+        centered
+        footer={null}
+      >
+        <SubmitModalBody formData={formData} setIsSubmitModalOpen={setIsSubmitModalOpen} />
+      </Modal>
     </div >
   );
 }
@@ -91,7 +117,6 @@ function UserInfo() {
       name="user"
       label="ชื่อ-นามสกุลผู้จอง"
       rules={[{ required: true, message: "Please input!" }]}
-      initialValue="ดวงจันทร์ จันทร์กระจ่าง"
     >
       <Input
         variant="boarderless" disabled
@@ -108,18 +133,22 @@ function DateInput({ date, setDate, }) {
 
   return (
     <Form.Item label="วันที่" name="date" initialValue={date} required>
-      <DatePicker format={dateFormat} onChange={handleChange} className="w-full" value={date ? dayjs(date) : null} />
-    </Form.Item>
-  );
-}
-
-function PhoneInput() {
-  return (
-    <Form.Item label="เบอร์โทรศัพท์" name="phone">
-      <Input placeholder="เบอร์โทรศัพท์" />
+      <DatePicker format={dateFormat} onChange={handleChange} className="w-full" />
     </Form.Item>
   );
 }
 
 
 export default BookingForm;
+
+const getInitialUser = () => {
+  const savedUser = localStorage.getItem('user');
+  if (savedUser) {
+    try {
+      return JSON.parse(savedUser);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+};
