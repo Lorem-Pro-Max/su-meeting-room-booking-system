@@ -1,14 +1,17 @@
 import Building from "../../assets/icon/building.svg";
 
-export function SubmitModalBody({ formData, setIsSubmitModalOpen }) {
-    console.log(formData)
+export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) {
+    const handleSubmit = () => {
+        setLoading(true)
+        setIsSubmitModalOpen(false)
+    }
     return (
         <div className="flex flex-col items-center">
             <h1 className="text-xl">สรุปข้อมูลการจอง</h1>
             <p>โปรดตรวจสอบรายละเอียดก่อนยืนยันการจอง</p>
             <div className="w-full mb-5 flex flex-col gap-4 border border-mint-dark rounded-xl p-6 ">
                 <h1 className="text-xl">{formData?.title}</h1>
-                <div className="w-full rounded-xl p-5 shadow-md">
+                <div className="w-full rounded-xl p-5 shadow-md border border-gray-200">
                     <div className="flex gap-2 mb-2">
                         <div className="bg-mint-dark p-4 rounded-xl">
                             <img src={Building} />
@@ -45,7 +48,8 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen }) {
                 </div>
             </div>
             <div className="w-full flex flex-col gap-2">
-                <button className="w-full rounded-lg bg-mint-dark py-2 !text-white hover:cursor-pointer">ยืนยันการจอง</button>
+                <button className="w-full rounded-lg bg-mint-dark py-2 text-white! hover:cursor-pointer"
+                    onClick={() => { handleSubmit() }}>ยืนยันการจอง</button>
                 <button className="w-full rounded-lg border border-[#D9D9D9] py-2 text-white hover:cursor-pointer" onClick={() => { setIsSubmitModalOpen(false) }}>แก้ไขข้อมูลการจอง</button>
             </div>
         </div>)
