@@ -19,7 +19,7 @@ function BookingCalendar({ date, setDate, bookings }) {
     const endDate = value.endOf("month").format("YYYY-MM-DD");
     try {
       const result = await getBuildingAvailability(startDate, endDate);
-      // ทำ lookup map ไว้ใช้ใน cellRender
+      console.log(result)
       const lookup = {};
       result.forEach((item) => {
         const key = item.date.slice(0, 10);

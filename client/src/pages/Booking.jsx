@@ -32,7 +32,6 @@ export default function Booking() {
     }
   }, [date]);
 
-  console.log(loading)
   useEffect(() => {
     getAllRooms()
       .then(setRooms)

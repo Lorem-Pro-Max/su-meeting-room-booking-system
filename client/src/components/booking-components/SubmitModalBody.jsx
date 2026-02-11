@@ -43,13 +43,8 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
                 end_dateTime,
             };
 
-            console.log("payload", payload)
-
             const result = await createBooking(payload);
-
-            console.log("Created:", result);
             setLoading(false)
-
         } catch (err) {
             setLoading(false)
             console.error(err.message);

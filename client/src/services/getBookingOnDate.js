@@ -1,12 +1,6 @@
-
-const API_BASE = import.meta.env.VITE_API_BASE;
+import { api } from "./api";
 
 export default async function getBookingOnDate(date) {
-  const res = await fetch(`${API_BASE}/booking/date/${date}`); 
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch bookings");
-  }
-  const result = await res.json();
-  return result.data; 
+  const response = await api.get(`/booking/date/${date}`);
+  return response.data.data;
 }
