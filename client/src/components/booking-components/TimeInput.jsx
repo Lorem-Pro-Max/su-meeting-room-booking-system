@@ -1,7 +1,6 @@
 import { Form, Select, Checkbox, } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useEffect } from "react";
 
 function TimeInput({ setFormData }) {
     const timeSlots = generateTimeSlots();

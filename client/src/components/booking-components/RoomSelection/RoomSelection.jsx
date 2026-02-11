@@ -49,7 +49,7 @@ export default function RoomSelection({
           </button>
           <button
             disabled={!tempSelectedRoom}
-            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom ? "bg-mint-dark hover:bg-mint-darker text-white cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
+            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom ? "bg-mint-dark hover:bg-mint-darker text-white! cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
             onClick={() => {
               if (tempSelectedRoom) {
                 setIsModalOpen(false);

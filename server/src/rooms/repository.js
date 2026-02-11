@@ -12,10 +12,11 @@ export async function findAllRooms() {
   FROM room
   LEFT JOIN building
     ON building.id = room.building_id
+  WHERE is_bookable = true
   ORDER BY room.floor, room.id
 `;
 
-return rooms;
+  return rooms;
 }
 
 export async function findBuildingAvailabilityByDateRange(startDate, endDate) {

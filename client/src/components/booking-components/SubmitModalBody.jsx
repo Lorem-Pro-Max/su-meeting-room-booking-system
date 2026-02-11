@@ -1,10 +1,62 @@
 import Building from "../../assets/icon/building.svg";
+import dayjs from "dayjs"
+import { createBooking } from "../../services/createBooking"
 
 export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) {
-    const handleSubmit = () => {
-        setLoading(true)
-        setIsSubmitModalOpen(false)
-    }
+    const handleSubmit = async (form) => {
+        try {
+            setLoading(true)
+            setIsSubmitModalOpen(false)
+            const {
+                title,
+                userId,
+                room,
+                selectedDate,
+                phone,
+                startTime,
+                endTime,
+            } = form;
+
+            const booking_date = dayjs(selectedDate).format("YYYY-MM-DD");
+
+            const start_dateTime = dayjs(
+                `${booking_date} ${startTime}`,
+                "YYYY-MM-DD HH:mm"
+            ).toISOString();
+
+            const end_dateTime = dayjs(
+                `${booking_date} ${endTime}`,
+                "YYYY-MM-DD HH:mm"
+            ).toISOString();
+
+            if (!dayjs(end_dateTime).isAfter(start_dateTime)) {
+                throw new Error("เวลาสิ้นสุดต้องมากกว่าเวลาเริ่ม");
+            }
+
+            const payload = {
+                meeting_name: title,
+                room_id: Number(room.id),
+                requester_id: Number(userId),
+                phone: phone || null,
+                booking_date,
+                start_dateTime,
+                end_dateTime,
+            };
+
+            console.log("payload", payload)
+
+            const result = await createBooking(payload);
+
+            console.log("Created:", result);
+            setLoading(false)
+
+        } catch (err) {
+            setLoading(false)
+            console.error(err.message);
+        }
+    };
+
+    console.log(formData)
     return (
         <div className="flex flex-col items-center">
             <h1 className="text-xl">สรุปข้อมูลการจอง</h1>
@@ -49,7 +101,7 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
             </div>
             <div className="w-full flex flex-col gap-2">
                 <button className="w-full rounded-lg bg-mint-dark py-2 text-white! hover:cursor-pointer"
-                    onClick={() => { handleSubmit() }}>ยืนยันการจอง</button>
+                    onClick={() => { handleSubmit(formData) }}>ยืนยันการจอง</button>
                 <button className="w-full rounded-lg border border-[#D9D9D9] py-2 text-white hover:cursor-pointer" onClick={() => { setIsSubmitModalOpen(false) }}>แก้ไขข้อมูลการจอง</button>
             </div>
         </div>)
