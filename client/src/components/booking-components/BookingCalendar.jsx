@@ -1,35 +1,22 @@
 import { Calendar, ConfigProvider, Grid } from "antd";
 import { useState, useEffect } from "react";
-import { isValidElement, cloneElement } from "react";
 import BookingListModal from "./BookingModal/BookingListModal";
-import { getBuildingAvailability } from "../../services";
-
+import { useBuildingAvailability } from "../../hooks/booking";
+import dayjs from "dayjs";
 
 function BookingCalendar({ date, setDate, bookings }) {
-  const [selectedValue, setSelectedValue] = useState(date);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [availabilityMap, setAvailabilityMap] = useState([]);
 
   const { useBreakpoint } = Grid;
   const screens = useBreakpoint();
   const isFullscreen = screens.xl;
 
-  const fetchAvailability = async (value) => {
-    const startDate = value.startOf("month").format("YYYY-MM-DD");
-    const endDate = value.endOf("month").format("YYYY-MM-DD");
-    try {
-      const result = await getBuildingAvailability(startDate, endDate);
-      console.log(result)
-      const lookup = {};
-      result.forEach((item) => {
-        const key = item.date.slice(0, 10);
-        lookup[key] = Number(item.available_percent);
-      });
-      setAvailabilityMap(lookup);
-    } catch (err) {
-      console.error("Fetch availability failed", err);
-    }
-  };
+  const {
+    availabilityMap,
+    fetchAvailability,
+    loading,
+  } = useBuildingAvailability();
+
 
   const onSelect = (date, { source }) => {
     setDate(date);
@@ -41,7 +28,7 @@ function BookingCalendar({ date, setDate, bookings }) {
   };
 
   useEffect(() => {
-    fetchAvailability(date);
+    if (date) { fetchAvailability(date); }
   }, [date]);
 
   return (<>
@@ -69,23 +56,8 @@ function BookingCalendar({ date, setDate, bookings }) {
       </style>
 
     </div >
-    <BookingListModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} bookings={bookings} /></>
+    <BookingListModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} bookings={bookings} availabilityMap={availabilityMap} /></>
   );
 }
 
 export default BookingCalendar
-
-function getBgColor(percent) {
-  if (percent === 0) { return "bg-red-500"; }
-  if (percent > 0 && percent <= 30) { return "bg-orange-400"; }
-  return "bg-green-500";
-}
-
-function buildAvailabilityLookup(availabilityArray) {
-  const lookup = {};
-  availabilityArray.forEach((item) => {
-    const key = item.date.slice(0, 10); // "YYYY-MM-DD" จาก "2026-01-20T00:00:00.000Z"
-    lookup[key] = Number(item.available_percent);
-  });
-  return lookup;
-}
