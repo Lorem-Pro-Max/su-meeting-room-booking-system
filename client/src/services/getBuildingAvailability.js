@@ -8,5 +8,5 @@ export default async function getBuildingAvailability(start_date, end_date) {
     },
   });
 
-  return response.data;
+  return response.data.data;
 }

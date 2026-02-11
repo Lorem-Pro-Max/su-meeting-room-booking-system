@@ -51,7 +51,6 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
         }
     };
 
-    console.log(formData)
     return (
         <div className="flex flex-col items-center">
             <h1 className="text-xl">สรุปข้อมูลการจอง</h1>
