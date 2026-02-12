@@ -5,10 +5,13 @@ import { logoutService } from "../../services";
 import { message } from "antd";
 
 import { useLocation, NavLink, useNavigate } from "react-router-dom";
+import LogoutModal from "./LogoutModal";
+import { useState } from "react";
 
 function Sidebar({ isMenuOpen }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -67,7 +70,7 @@ function Sidebar({ isMenuOpen }) {
       {/* เมนูล่าง (Logout) */}
       <div className="w-full px-3">
         <div
-          onClick={handleLogout}
+          onClick={() => setIsLogoutModalOpen(true)}
           className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
             }`}
         >
@@ -75,6 +78,7 @@ function Sidebar({ isMenuOpen }) {
           {isMenuOpen && <p className="text-sm font-medium pt-4">Logout</p>}
         </div>
       </div>
+      <LogoutModal handleLogout={handleLogout} isLogoutModalOpen={isLogoutModalOpen} setIsLogoutModalOpen={setIsLogoutModalOpen} />
     </div>
   );
 }
