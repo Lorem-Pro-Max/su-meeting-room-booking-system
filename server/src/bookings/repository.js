@@ -13,7 +13,7 @@ export async function findBookingsRange(from, to) {
 
 /* booking ทั้งหมดในวัน */
 export async function findBookingsOnDate(date) {
-    return sql`
+  return sql`
       SELECT 
         room_booking.*, 
         "user".firstname, 
@@ -30,15 +30,37 @@ export async function findBookingsOnDate(date) {
       WHERE room_booking.booking_date = ${date}
       ORDER BY room_booking."start_dateTime" ASC
     `;
-  }
+}
 
 /* booking ของฉัน */
 export async function findMyBookings(requesterId) {
   return sql`
-    SELECT *
-    FROM room_booking
-    WHERE requester_id = ${requesterId}
-    ORDER BY booking_date DESC, "start_dateTime" DESC
+    SELECT 
+      rb.id,
+      rb.meeting_name,
+      rb.room_id,
+      rb.requester_id,
+      rb.phone,
+      rb."start_dateTime" AS start_datetime,
+      rb."end_dateTime" AS end_datetime,
+      rb.booking_date,
+      rb.created_at,
+      rb.status_id,
+      bs.status AS booking_status,
+      u.firstname,
+      u.lastname,
+      r.title,
+      r.floor
+    FROM room_booking rb
+    LEFT JOIN booking_status bs
+      ON rb.status_id = bs.id
+    LEFT JOIN "user" u
+      ON rb.requester_id = u.id
+    LEFT JOIN room r
+      ON rb.room_id = r.id
+    WHERE rb.requester_id = ${requesterId}
+      AND rb.booking_date >= CURRENT_DATE - INTERVAL '6 months'
+    ORDER BY rb.booking_date DESC, rb."start_dateTime" DESC
   `;
 }
 
@@ -84,4 +106,3 @@ export async function updateBookingStatus(id, statusId, actionBy, reason) {
   `;
   return row;
 }
- 

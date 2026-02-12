@@ -1,12 +1,35 @@
 import Booking from "../../assets/icon/booking.svg";
 import History from "../../assets/icon/history.svg";
 import Logout from "../../assets/icon/logout.svg";
+import { logoutService } from "../../services";
+import { message } from "antd";
 
-import { useLocation } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
+import LogoutModal from "./LogoutModal";
+import { useState } from "react";
 
 function Sidebar({ isMenuOpen }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+
+  const handleLogout = async () => {
+    try {
+      await logoutService();
+
+      sessionStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+
+      message.success("ออกจากระบบเรียบร้อย");
+
+      navigate("/login");
+    } catch (err) {
+      console.error("Logout failed:", err);
+      sessionStorage.clear();
+      localStorage.clear();
+      navigate("/login");
+    }
+  };
 
   return (
     <div
@@ -46,15 +69,16 @@ function Sidebar({ isMenuOpen }) {
 
       {/* เมนูล่าง (Logout) */}
       <div className="w-full px-3">
-        <NavLink
-          to="/login"
+        <div
+          onClick={() => setIsLogoutModalOpen(true)}
           className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
             }`}
         >
           <img src={Logout} className="w-[18px] h-[18px]" alt="logout" />
           {isMenuOpen && <p className="text-sm font-medium pt-4">Logout</p>}
-        </NavLink>
+        </div>
       </div>
+      <LogoutModal handleLogout={handleLogout} isLogoutModalOpen={isLogoutModalOpen} setIsLogoutModalOpen={setIsLogoutModalOpen} />
     </div>
   );
 }

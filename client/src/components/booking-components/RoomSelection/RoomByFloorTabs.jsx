@@ -35,5 +35,10 @@ export default function RoomsByFloorTabs({
     });
   }, [roomsGroupedByFloor, tempSelectedRoom, onSelectTempRoom]);
 
-  return <Tabs defaultActiveKey={floorTabItems[0]?.key ?? "1"} items={floorTabItems} indicator={{ size: (origin) => origin - 20 }} />;
+  return (
+    <Tabs
+      defaultActiveKey={floorTabItems[0]?.key ?? "1"}
+      items={floorTabItems}
+      indicator={{ size: (origin) => origin - 20 }}
+    />)
 }

@@ -1,3 +1,4 @@
 export { default as getAllRooms } from "./getAllRoom";
 export { default as getBookingOnDate } from "./getBookingOnDate";
 export { default as getBuildingAvailability } from "./getBuildingAvailability";
+export * from "./authService";

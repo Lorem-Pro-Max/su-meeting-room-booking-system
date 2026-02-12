@@ -1,11 +1,8 @@
-const API_BASE = import.meta.env.VITE_API_BASE;
+import { api } from "./api";
 
 async function getAllRooms() {
-  const res = await fetch(`${API_BASE}/rooms`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch rooms");
-  }
-  return res.json();
+  const response = await api.get("/rooms");
+  return response.data;
 }
 
-export default getAllRooms
+export default getAllRooms;

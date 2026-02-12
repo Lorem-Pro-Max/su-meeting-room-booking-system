@@ -1,13 +1,59 @@
-import {
-    Form,
-    Select,
-    Checkbox,
-} from "antd";
-
-
+import { Form, Select, Checkbox, } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
-function TimeInput() {
+function TimeInput({ setFormData }) {
+    const timeSlots = generateTimeSlots();
+    const form = Form.useFormInstance();
+    const selectedTimes = Form.useWatch("time", form) || [];
+
+    const getDisplayText = () => {
+        if (selectedTimes.length === 0) { return undefined; }
+        const firstSlot = timeSlots.find(slot => slot.value === selectedTimes[0]);
+        const lastSlot = timeSlots.find(slot => slot.value === selectedTimes[selectedTimes.length - 1]);
+
+        return `${firstSlot?.start} - ${lastSlot?.end}`;
+    };
+
+    const handleSelect = (clickedValue) => {
+        const allValues = timeSlots.map(slot => slot.value);
+        const clickedIdx = allValues.indexOf(clickedValue);
+        const currentIndices = selectedTimes.map(value => allValues.indexOf(value));
+
+        let newSelected = [];
+        if (selectedTimes.includes(clickedValue)) {
+            const minIdx = Math.min(...currentIndices);
+            const maxIdx = Math.max(...currentIndices);
+            newSelected = (Math.abs(clickedIdx - minIdx) <= Math.abs(clickedIdx - maxIdx))
+                ? allValues.slice(clickedIdx + 1, maxIdx + 1)
+                : allValues.slice(minIdx, clickedIdx);
+        } else {
+            const minIdx = currentIndices.length > 0 ? Math.min(...currentIndices, clickedIdx) : clickedIdx;
+            const maxIdx = currentIndices.length > 0 ? Math.max(...currentIndices, clickedIdx) : clickedIdx;
+            newSelected = allValues.slice(minIdx, maxIdx + 1);
+        }
+
+        updateTimeData(newSelected)
+    };
+
+    const updateTimeData = (newSelected) => {
+        form.setFieldsValue({ time: newSelected });
+
+        if (newSelected.length > 0) {
+            const firstSlot = timeSlots.find(s => s.value === newSelected[0]);
+            const lastSlot = timeSlots.find(s => s.value === newSelected[newSelected.length - 1]);
+
+            setFormData(prev => ({
+                ...prev,
+                startTime: firstSlot.start,
+                endTime: lastSlot.end
+            }));
+        } else {
+            setFormData(prev => ({ ...prev, startTime: null, endTime: null }));
+        }
+    };
+
+
     return (
         <Form.Item
             label={<span>เวลาที่ต้องการจอง</span>}
@@ -17,22 +63,33 @@ function TimeInput() {
             <Select
                 mode="multiple"
                 placeholder="เลือกเวลาที่ต้องการจอง"
-                className="w-full"
                 classNames="time-selector-dropdown"
-                maxTagCount="responsive"
                 suffixIcon={<CalendarOutlined />}
+                value={selectedTimes}
+                maxTagCount={0}
+                maxTagPlaceholder={() => getDisplayText()}
+                allowClear
+                onClear={() => updateTimeData([])}
                 popupRender={() => (
-                    <div className="p-2 flex flex-col gap-1 max-w-87 overflow-scroll">
-                        {timeSlots.map((time) => (
-                            <div
-                                key={time}
-                                className={`flex items-center p-2 rounded-lg hover:bg-teal-50 transition-colors`}
-                            >
-                                <Checkbox className="w-full text-gray-600">
-                                    {time}
-                                </Checkbox>
-                            </div>
-                        ))}
+                    <div className="p-2 flex flex-col gap-1 max-h-100 overflow-scroll">
+                        {timeSlots.map((time) => {
+                            const isSelected = selectedTimes.includes(time.value)
+                            return (
+                                <div
+                                    key={time.value}
+                                    onClick={() => handleSelect(time.value)}
+                                    className={`flex items-center p-2 rounded-lg hover:bg-teal-50 transition-colors`}
+                                >
+                                    <Checkbox
+                                        checked={isSelected}
+                                        className="w-full text-gray-600 pointer-events-none"
+                                    >
+                                        <span className={isSelected ? "text-teal-700 font-medium" : ""}>
+                                            {time.label}
+                                        </span>
+                                    </Checkbox>
+                                </div>)
+                        })}
                     </div>
                 )}
             />
@@ -40,7 +97,23 @@ function TimeInput() {
     );
 }
 
+
 export default TimeInput
 
-const timeSlots = ["08:00-08:30 น.", "08:30-09:00 น.", "09:00-09:30 น.", "09:30-10:00 น.", "10:00-10:30 น.", "10:30-11:00 น.", "11:00-11:30 น.", "11:30-12:00 น.", "12:00-12:30 น.", "12:30-13:00 น.", "13:00-13:30 น.", "13:30-14:00 น.", "14:00-14:30 น.", "14:30-15:00 น.", "15:00-15:30 น.", "15:30-16:00 น.", "16:00-16:30 น.", "16:30-17:00 น.", "17:00-17:30 น.", "17:30-18:00 น.", "18:00-18:30 น.", "18:30-19:00 น.", "19:00-19:30 น.", "19:30-20:00 น.", "20:00-20:30 น.", "20:30-21:00 น."
-];
+const generateTimeSlots = () => {
+    const slots = [];
+    let start = dayjs().hour(8).minute(0);
+    const endLimit = dayjs().hour(21).minute(0);
+
+    while (start.isBefore(endLimit)) {
+        const next = start.add(30, 'minute');
+        slots.push({
+            value: start.format("HH:mm"),
+            label: `${start.format("HH:mm")} - ${next.format("HH:mm")} น.`,
+            start: start.format("HH:mm"),
+            end: next.format("HH:mm")
+        });
+        start = next;
+    }
+    return slots;
+};
