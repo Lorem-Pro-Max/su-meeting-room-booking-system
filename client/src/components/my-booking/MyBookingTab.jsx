@@ -5,7 +5,7 @@ import { isUpcomingBooking, isHistoryBooking, shouldHideBooking } from "../../ut
 import { useMemo } from "react";
 
 
-export function MyBookingTab({ myBookings }) {
+export function MyBookingTab({ myBookings, setLoading }) {
     const visibleBookings = useMemo(() => {
         return myBookings.filter((b) => !shouldHideBooking(b.booking_status));
     }, [myBookings]);
@@ -23,8 +23,8 @@ export function MyBookingTab({ myBookings }) {
     }, [visibleBookings]);
 
     const items = [
-        { key: "1", label: "ที่กำลังจะมาถึง", children: <MyBookingCard myBookings={upcoming} /> },
-        { key: "2", label: "ประวัติการจอง", children: <MyBookingCard myBookings={history} /> },
+        { key: "1", label: "ที่กำลังจะมาถึง", children: <MyBookingCard myBookings={upcoming} mode="upcoming" setLoading={setLoading} /> },
+        { key: "2", label: "ประวัติการจอง", children: <MyBookingCard myBookings={history} mode="history" /> },
     ];
 
     const onChange = key => { };

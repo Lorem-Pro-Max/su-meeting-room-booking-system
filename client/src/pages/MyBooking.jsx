@@ -12,7 +12,6 @@ export default function MyBooking() {
 
   useEffect(() => {
     const fetchMyBookings = async () => {
-      const user = getCurrentUser();
       try {
         setLoading(true);
         const data = await getMyBookings(1);
@@ -33,12 +32,7 @@ export default function MyBooking() {
       <Spin spinning={loading} indicator={<LoadingOutlined spin />} size="large" tip="Loading" fullscreen />
       <div className="bg-white w-full h-full ml-4 px-7 py-6">
         <p className="text-2xl">การจองของฉัน</p>
-
-        {loading ? (
-          <p className="text-gray-400 mt-4">กำลังโหลด...</p>
-        ) : (
-          <MyBookingTab myBookings={myBookings} />
-        )}
+        <MyBookingTab myBookings={myBookings} setLoading={setLoading} />
       </div>
     </>
   );
