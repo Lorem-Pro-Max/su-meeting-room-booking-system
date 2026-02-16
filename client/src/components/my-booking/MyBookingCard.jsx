@@ -4,7 +4,7 @@ import MyBookingCardFooter from "./MyBookingCardFooter"
 import noBookingImage from "../../assets/image/no-booking.png"
 
 function MyBookingCard({ myBookings, mode, setLoading }) {
-    if (!Array.isArray(myBookings) || myBookings.length === 0) {
+    if (!Array.isArray(myBookings) || myBookings?.length === 0) {
         return (
             <div className="flex flex-col items-center">
                 <img src={noBookingImage} className="w-40" />
@@ -13,7 +13,7 @@ function MyBookingCard({ myBookings, mode, setLoading }) {
     }
     return (
         <div className="space-y-4">
-            {myBookings.map((booking) => (
+            {myBookings?.map((booking) => (
                 <div key={booking.id} className="rounded-lg shadow-lg max-w-[1143px]">
                     <MyBookingCardHeader booking={booking} />
                     <MyBookingCardBody booking={booking} />

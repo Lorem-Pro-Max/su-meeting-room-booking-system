@@ -63,7 +63,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
             },
           }}
         >
-          <Form layout="vertical" className="flex flex-col gap-2 " initialValues={{
+          <Form form={form} layout="vertical" className="flex flex-col gap-2 " initialValues={{
             user: formData.userName, // แสดงชื่อผู้จองทันที
             date: date
           }}>
