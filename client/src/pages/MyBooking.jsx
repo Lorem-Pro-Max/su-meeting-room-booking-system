@@ -9,24 +9,38 @@ import RejectedBookingModal from "../components/my-booking/RejectedBookingModal"
 export default function MyBooking() {
   const [myBookings, setMyBookings] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(true)
+  const [selectedBooking, setSelectedBooking] = useState(null);
+
+
+  const fetchMyBookings = async () => {
+    try {
+      setLoading(true);
+      const data = await getMyBookings(1);
+      setMyBookings(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error(err.message);
+      setMyBookings([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchMyBookings = async () => {
-      try {
-        setLoading(true);
-        const data = await getMyBookings(1);
-        setMyBookings(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error(err.message);
-        setMyBookings([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchMyBookings();
   }, []);
+
+  useEffect(() => {
+    const rejected = myBookings.find(
+      (booking) =>
+        booking.is_notified === false &&
+        (booking.booking_status === "rejectedByAdmin" ||
+          booking.booking_status === "canceledByAdmin")
+    );
+
+    if (rejected) {
+      setSelectedBooking(rejected);
+    }
+  }, [myBookings]);
 
   return (
     <>
@@ -35,7 +49,13 @@ export default function MyBooking() {
         <p className="text-2xl">การจองของฉัน</p>
         <MyBookingTab myBookings={myBookings} setLoading={setLoading} />
       </div>
-      <RejectedBookingModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      {selectedBooking && (<RejectedBookingModal
+        booking={selectedBooking}
+        onClose={() => setSelectedBooking(null)}
+        fetchMyBookings={fetchMyBookings}
+      />
+      )}
+
     </>
   );
 }

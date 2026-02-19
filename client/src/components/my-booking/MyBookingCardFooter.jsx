@@ -7,7 +7,6 @@ import CancelBookingModal from './CancleBookingModal';
 import { updateBookingStatus } from '../../services/updateBookingStatus';
 
 function MyBookingCardFooter({ booking, mode, setLoading }) {
-    console.log(booking)
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const start = booking?.start_datetime ? dayjs(booking.start_datetime) : null;
@@ -43,7 +42,6 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
         }
     };
 
-    console.log(booking)
     return (<div className="flex flex-col sm:flex-row p-4 justify-between rounded-b-lg gap-3">
         <div className="flex sm:flex-row flex-col gap-2 sm:items-center">
             <div className="flex gap-2 items-center">

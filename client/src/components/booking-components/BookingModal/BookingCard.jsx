@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 const { Text, Title } = Typography;
 
 function BookingCard({ bookings }) {
-    console.log(bookings)
     if (bookings?.length === 0) {
         return (
             <p className="text-gray-300 text-sm font-light text-center">ยังไม่มีประวัติการจอง</p>

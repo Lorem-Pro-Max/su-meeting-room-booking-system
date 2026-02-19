@@ -3,13 +3,21 @@ import RejectedBookingImg from "../../assets/image/rejectedBooking.png"
 import { ClockCircleOutlined } from '@ant-design/icons';
 import CalendarIcon from "../../assets/icon/calendar.svg"
 import { EnvironmentOutlined } from "@ant-design/icons";
+import { updateBookingNotiStatus } from '../../services/updateBookingNotiStatus';
 
-function RejectedBookingModal({ isModalOpen, setIsModalOpen, }) {
+function RejectedBookingModal({ onClose, booking, fetchMyBookings }) {
+    if (!booking) return null;
+
+    const handleUpdateNotiStatus = async () => {
+        await updateBookingNotiStatus(booking.id, true);
+        await fetchMyBookings()
+        onClose();
+    };
     return (
         <Modal
             closable={{ 'aria-label': 'Custom Close Button' }}
-            open={isModalOpen}
-            onCancel={() => setIsModalOpen(false)}
+            open={true}
+            onCancel={handleUpdateNotiStatus}
             centered
             footer={null}
             width={448}
@@ -22,7 +30,7 @@ function RejectedBookingModal({ isModalOpen, setIsModalOpen, }) {
                     <hr className="my-1 pb-3 border-t border-gray-300 w-full mx-auto" />
                 </div>
                 <div className='flex flex-col items-center justify-center'>
-                    <span className="text-[16px]">วิวัฒนาการและระบบนิเวศ</span>
+                    <span className="text-[16px]">{booking.meeting_name}</span>
                     <div className="flex gap-2 items-center">
                         <img src={CalendarIcon} />
                         <span>17 Dec 2025</span>
@@ -36,14 +44,14 @@ function RejectedBookingModal({ isModalOpen, setIsModalOpen, }) {
                         <EnvironmentOutlined />
                     </div>
                     <div className="min-w-0">
-                        <div className="font-bold text-sm leading-tight truncate">ห้องเรียน 5 </div>
+                        <div className="font-bold text-sm leading-tight truncate">{booking.title}</div>
                         <div className="text-[12px]">ชั้น 4 อาคารการเรียนการสอนและปฎิบัติการคณะวิทยาศาสตร์</div>
                     </div>
                 </div>
                 <div className="w-full flex flex-col sm:flex-row gap-2 pt-5">
                     <button
                         className="w-full sm:w-1/2 rounded-lg h-10 border border-gray-300 text-gray-700 hover:bg-gray-100 transition cursor-pointer"
-                        onClick={() => setIsModalOpen(false)}
+                        onClick={handleUpdateNotiStatus}
                     >
                         ยกเลิก
                     </button>

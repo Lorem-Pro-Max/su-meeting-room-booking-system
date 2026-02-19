@@ -46,6 +46,7 @@ export async function findMyBookings(requesterId) {
       rb.booking_date,
       rb.created_at,
       rb.status_id,
+      rb.is_notified,
       bs.status AS booking_status,
       u.firstname,
       u.lastname,
@@ -103,6 +104,16 @@ export async function updateBookingStatus(id, statusId, actionBy, reason) {
       reason = ${reason}
     WHERE id = ${id}
     RETURNING *
+  `;
+  return row;
+}
+
+export async function updateBookingNotiStatus(id, status) {
+  const [row] = await sql`
+    UPDATE room_booking
+    SET
+      is_notified = ${status.status}
+    WHERE id = ${id}
   `;
   return row;
 }
