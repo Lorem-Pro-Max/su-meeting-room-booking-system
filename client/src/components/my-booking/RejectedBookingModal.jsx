@@ -4,8 +4,12 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 import CalendarIcon from "../../assets/icon/calendar.svg"
 import { EnvironmentOutlined } from "@ant-design/icons";
 import { updateBookingNotiStatus } from '../../services/updateBookingNotiStatus';
+import { useNavigate } from "react-router-dom";
+
 
 function RejectedBookingModal({ onClose, booking, fetchMyBookings }) {
+    const navigate = useNavigate();
+
     if (!booking) return null;
 
     const handleUpdateNotiStatus = async () => {
@@ -58,7 +62,10 @@ function RejectedBookingModal({ onClose, booking, fetchMyBookings }) {
                     <button
 
                         className="w-full sm:w-1/2 rounded-lg h-10 transition bg-mint-dark hover:bg-teal-600 text-white! cursor-pointer"
-                    //onClick={() => handleUpdateBookingStatus(7, "ยกเลิกโดยผู้ใช้งาน")}
+                        onClick={async () => {
+                            await handleUpdateNotiStatus();
+                            navigate("/");
+                        }}
                     >
                         จองอีกครั้ง
                     </button>
