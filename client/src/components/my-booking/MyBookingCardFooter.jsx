@@ -5,8 +5,11 @@ import dayjs from "dayjs";
 import { useState } from 'react';
 import CancelBookingModal from './CancleBookingModal';
 import { updateBookingStatus } from '../../services/updateBookingStatus';
+import { useNavigate } from "react-router-dom";
 
 function MyBookingCardFooter({ booking, mode, setLoading }) {
+    const navigate = useNavigate();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const start = booking?.start_datetime ? dayjs(booking.start_datetime) : null;
@@ -23,6 +26,7 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
     const openButtonDisabled = bookingStatus === "checked-in";
     const openButtonText = bookingStatus === "checked-in" ? "เปิดห้องประชุมแล้ว" : "เปิดห้องประชุม";
     const showCancelButton = showActions && (bookingStatus === "pending" || bookingStatus === "approved" || bookingStatus === "checked-in");
+    const showReBookingButton = (bookingStatus === "rejectedByAdmin" || bookingStatus === "canceledByAdmin")
     const cancelButtonDisabled = bookingStatus !== "pending";
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
@@ -80,6 +84,16 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
                     }}
                 >
                     ยกเลิกการจอง
+                </button>
+            )}
+            {showReBookingButton && (
+                <button
+                    className={`w-full sm:w-auto rounded-lg border py-2 px-4 font-medium transition border-mint-dark text-gray-800 hover:bg-mint-dark hover:text-white! cursor-pointer`}
+                    onClick={() => {
+                        navigate("/");
+                    }}
+                >
+                    จองใหม่อีกครั้ง
                 </button>
             )}
         </div>
