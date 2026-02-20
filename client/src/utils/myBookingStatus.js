@@ -6,29 +6,40 @@ export function isUpcomingBooking(booking) {
   const status = booking?.booking_status;
   if (!status || shouldHideBooking(status)) return false;
 
-  const isUpcomingStatus = ["pending", "approved", "checked-in"].includes(
-    status,
-  );
-  if (!isUpcomingStatus) return false;
+  const isUpcomingStatus = ["pending", "approved", "checked-in"];
 
-  const today = new Date().toISOString().split("T")[0];
+  const statusMatch = isUpcomingStatus.includes(status);
 
-  return booking.booking_date >= today;
+  const now = new Date();
+  now.setHours(now.getHours() + 7);
+  const today = now.toISOString().split("T")[0];
+
+  const bookingDate = booking.booking_date.substring(0, 10);
+
+  return bookingDate >= today && statusMatch;
 }
 
 export function isHistoryBooking(booking) {
   const status = booking?.booking_status;
   if (!status || shouldHideBooking(status)) return false;
 
-  const finishedStatus = ["rejectedByAdmin", "canceledByAdmin", "completed"];
+  const finishedStatus = [
+    "rejectedByAdmin",
+    "canceledByAdmin",
+    "completed",
+    "pending",
+    "approved",
+  ];
 
-  if (finishedStatus.includes(status)) return true;
+  const statusMatch = finishedStatus.includes(status);
 
-  const today = new Date().toISOString().split("T")[0];
+  const now = new Date();
+  now.setHours(now.getHours() + 7);
+  const today = now.toISOString().split("T")[0];
 
-  if (booking.booking_date < today) return true;
+  const bookingDate = booking.booking_date.substring(0, 10);
 
-  return false;
+  return bookingDate < today && statusMatch;
 }
 
 export function getStatusBadge(status) {

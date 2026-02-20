@@ -7,6 +7,7 @@ import CancelBookingModal from './CancleBookingModal';
 import { updateBookingStatus } from '../../services/updateBookingStatus';
 import { createIotSchedule } from '../../services/createIotSchedule';
 import { useNavigate } from "react-router-dom";
+import { Tooltip } from 'antd';
 
 function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const navigate = useNavigate();
@@ -15,6 +16,8 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
 
     const start = booking?.start_datetime ? dayjs(booking.start_datetime) : null;
     const end = booking?.end_datetime ? dayjs(booking.end_datetime) : null;
+    const now = dayjs();
+    const isLate = start ? now.isAfter(start) : false;
 
     const dateText = start ? start.format("DD MMM YYYY") : "-";
     const timeText = start && end ? `${start.format("HH:mm")}-${end.format("HH:mm")}` : "-";
@@ -22,14 +25,18 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const status = getStatusBadge(booking?.booking_status);
 
     const bookingStatus = booking?.booking_status;
-    const showActions = mode === "upcoming"; // คงไว้เหมือนเดิม
+    const showActions = mode === "upcoming";
+
     const showOpenButton = showActions && (bookingStatus === "approved" || bookingStatus === "checked-in");
-    const openButtonDisabled = bookingStatus === "checked-in";
+    const openButtonDisabled = bookingStatus === "checked-in" || isLate;
     const openButtonText = bookingStatus === "checked-in" ? "เปิดห้องประชุมแล้ว" : "เปิดห้องประชุม";
     const showCancelButton = showActions && (bookingStatus === "pending" || bookingStatus === "approved" || bookingStatus === "checked-in");
     const showReBookingButton = (bookingStatus === "rejectedByAdmin" || bookingStatus === "canceledByAdmin")
     const cancelButtonDisabled = !["pending", "approved"].includes(bookingStatus);
 
+    const disabledReason = isLate
+        ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาที่จองได้ กรุณาติดต่อเจ้าหน้าที่"
+        : "";
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
         try {
@@ -82,17 +89,18 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             {showOpenButton && (
-                <button
-                    disabled={openButtonDisabled}
-                    className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition ${openButtonDisabled ? "bg-[#52C41A] text-white!  cursor-not-allowed" : "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"}`}
-                    onClick={async () => {
-                        if (openButtonDisabled) return;
-                        //await handleUpdateBookingStatus(5);
-                        await createSchedule(booking);
-                    }}
-                >
-                    {openButtonText}
-                </button>
+                <Tooltip title={isLate ? disabledReason : ""}>
+                    <button
+                        disabled={openButtonDisabled}
+                        className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition ${openButtonDisabled ? "bg-[#52C41A] text-white!  cursor-not-allowed" : "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"}`}
+                        onClick={async () => {
+                            if (openButtonDisabled) return;
+                            await createSchedule(booking);
+                        }}
+                    >
+                        {openButtonText}
+                    </button>
+                </Tooltip>
             )}
 
             {showCancelButton && (
