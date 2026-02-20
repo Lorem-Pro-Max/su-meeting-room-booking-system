@@ -6,14 +6,29 @@ export function isUpcomingBooking(booking) {
   const status = booking?.booking_status;
   if (!status || shouldHideBooking(status)) return false;
 
-  return ["pending", "approved", "checked-in"].includes(status);
+  const isUpcomingStatus = ["pending", "approved", "checked-in"].includes(
+    status,
+  );
+  if (!isUpcomingStatus) return false;
+
+  const today = new Date().toISOString().split("T")[0];
+
+  return booking.booking_date >= today;
 }
 
 export function isHistoryBooking(booking) {
   const status = booking?.booking_status;
   if (!status || shouldHideBooking(status)) return false;
 
-  return ["rejectedByAdmin", "canceledByAdmin", "completed"].includes(status);
+  const finishedStatus = ["rejectedByAdmin", "canceledByAdmin", "completed"];
+
+  if (finishedStatus.includes(status)) return true;
+
+  const today = new Date().toISOString().split("T")[0];
+
+  if (booking.booking_date < today) return true;
+
+  return false;
 }
 
 export function getStatusBadge(status) {

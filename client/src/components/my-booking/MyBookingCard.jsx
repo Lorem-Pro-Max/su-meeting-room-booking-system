@@ -3,7 +3,7 @@ import MyBookingCardBody from "./MyBookingCardBody"
 import MyBookingCardFooter from "./MyBookingCardFooter"
 import noBookingImage from "../../assets/image/no-booking.png"
 
-function MyBookingCard({ myBookings, mode, setLoading }) {
+function MyBookingCard({ myBookings, mode, setLoading, user }) {
     if (!Array.isArray(myBookings) || myBookings?.length === 0) {
         return (
             <div className="flex flex-col items-center">
@@ -17,7 +17,7 @@ function MyBookingCard({ myBookings, mode, setLoading }) {
                 <div key={booking.id} className="rounded-lg shadow-lg max-w-[1143px]">
                     <MyBookingCardHeader booking={booking} />
                     <MyBookingCardBody booking={booking} />
-                    <MyBookingCardFooter booking={booking} mode={mode} setLoading={setLoading} />
+                    <MyBookingCardFooter booking={booking} mode={mode} setLoading={setLoading} user={user} />
                 </div>
             ))}
         </div>)

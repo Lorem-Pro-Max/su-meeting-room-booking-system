@@ -4,18 +4,21 @@ import getMyBookings from "../services/getMyBookings";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import RejectedBookingModal from "../components/my-booking/RejectedBookingModal";
+import { getCurrentUser } from "../utils/getCurrentUser";
 
 
 export default function MyBooking() {
   const [myBookings, setMyBookings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const userInfo = getCurrentUser()
 
+  console.log("user", userInfo)
 
   const fetchMyBookings = async () => {
     try {
       setLoading(true);
-      const data = await getMyBookings(1);
+      const data = await getMyBookings(userInfo.id);
       setMyBookings(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err.message);
@@ -45,9 +48,9 @@ export default function MyBooking() {
   return (
     <>
       <Spin spinning={loading} indicator={<LoadingOutlined spin />} size="large" tip="Loading" fullscreen />
-      <div className="bg-white w-full ml-4 px-7 py-6">
+      <div className="bg-white w-full min-h-full ml-4 px-7 py-6">
         <p className="text-2xl">การจองของฉัน</p>
-        <MyBookingTab myBookings={myBookings} setLoading={setLoading} />
+        <MyBookingTab myBookings={myBookings} setLoading={setLoading} user={userInfo} />
       </div>
       {selectedBooking && (<RejectedBookingModal
         booking={selectedBooking}

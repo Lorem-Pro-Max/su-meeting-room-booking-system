@@ -5,9 +5,10 @@ import dayjs from "dayjs";
 import { useState } from 'react';
 import CancelBookingModal from './CancleBookingModal';
 import { updateBookingStatus } from '../../services/updateBookingStatus';
+import { createIotSchedule } from '../../services/createIotSchedule';
 import { useNavigate } from "react-router-dom";
 
-function MyBookingCardFooter({ booking, mode, setLoading }) {
+function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +28,9 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
     const openButtonText = bookingStatus === "checked-in" ? "เปิดห้องประชุมแล้ว" : "เปิดห้องประชุม";
     const showCancelButton = showActions && (bookingStatus === "pending" || bookingStatus === "approved" || bookingStatus === "checked-in");
     const showReBookingButton = (bookingStatus === "rejectedByAdmin" || bookingStatus === "canceledByAdmin")
-    const cancelButtonDisabled = bookingStatus !== "pending";
+    const cancelButtonDisabled = !["pending", "approved"].includes(bookingStatus);
+
+    console.log(booking)
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
         try {
@@ -36,15 +39,33 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
             await updateBookingStatus({
                 bookingId: booking.id,
                 statusId: statusId,
-                actionBy: Number(booking.requester_id),
+                actionBy: user.id,
                 reason: reason,
             });
 
             setIsModalOpen(false);
+        } catch (error) {
+            console.error("Update booking failed:", error);
         } finally {
             setLoading(false);
         }
     };
+
+    const createSchedule = async (booking) => {
+        try {
+            setLoading(true)
+            await createIotSchedule({
+                booking_id: booking.id,
+                room_id: booking.room_id,
+                action_time: booking.start_datetime,
+                action: "on"
+            })
+        } catch (error) {
+            console.error("Create schedule failed:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (<div className="flex flex-col sm:flex-row p-4 justify-between rounded-b-lg gap-3">
         <div className="flex sm:flex-row flex-col gap-2 sm:items-center">
@@ -65,9 +86,10 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
                 <button
                     disabled={openButtonDisabled}
                     className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition ${openButtonDisabled ? "bg-[#52C41A] text-white!  cursor-not-allowed" : "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"}`}
-                    onClick={() => {
+                    onClick={async () => {
                         if (openButtonDisabled) return;
-                        handleUpdateBookingStatus(5)
+                        await handleUpdateBookingStatus(5);
+                        await createSchedule();
                     }}
                 >
                     {openButtonText}

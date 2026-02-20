@@ -1,4 +1,11 @@
 export const getCurrentUser = () => {
   const savedUser = localStorage.getItem("user");
-  return savedUser ? JSON.parse(savedUser) : null;
+  if (savedUser) {
+    try {
+      return JSON.parse(savedUser);
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
 };
