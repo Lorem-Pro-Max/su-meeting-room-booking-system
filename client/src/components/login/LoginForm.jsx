@@ -4,18 +4,18 @@ import Logo from "../../assets/icon/logo.svg";
 import KeySvg from "../../assets/icon/key.svg"
 import { UserOutlined } from '@ant-design/icons';
 import { loginService } from '../../services/index'
-
+import { useNavigate } from 'react-router-dom'
 
 function LoginForm() {
+    const navigate = useNavigate();
     const handleLogin = async (values) => {
         try {
             const data = await loginService(values.username, values.password);
 
-            sessionStorage.setItem('accessToken', data.accessToken);
-
+            localStorage.setItem('accessToken', data.accessToken);
             localStorage.setItem('user', JSON.stringify(data.user));
 
-            window.location.href = '/';
+            navigate('/');
         } catch (err) {
             const errorMsg = err.response?.data?.message || 'การเชื่อมต่อผิดพลาด';
             console.error(errorMsg);
