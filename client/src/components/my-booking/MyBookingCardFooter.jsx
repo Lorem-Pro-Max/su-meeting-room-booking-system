@@ -35,7 +35,7 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const cancelButtonDisabled = !["pending", "approved"].includes(bookingStatus);
 
     const disabledReason = isLate
-        ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาที่จองได้ กรุณาติดต่อเจ้าหน้าที่"
+        ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาที่จองไว้ กรุณาติดต่อเจ้าหน้าที่"
         : "";
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
@@ -92,10 +92,18 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
                 <Tooltip title={isLate ? disabledReason : ""}>
                     <button
                         disabled={openButtonDisabled}
-                        className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition ${openButtonDisabled ? "bg-[#52C41A] text-white!  cursor-not-allowed" : "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"}`}
+                        className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition 
+                            ${!openButtonDisabled
+                                ? "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer" // สถานะปกติ
+                                : (bookingStatus === "checked-in"
+                                    ? "bg-[#52C41A] text-white! cursor-not-allowed" // เขียวสด (Check-in แล้ว)
+                                    : "bg-[#52C41A]/40 text-white! cursor-not-allowed" // เขียวซีด (Disable เพราะ Late)
+                                )
+                            }`}
                         onClick={async () => {
                             if (openButtonDisabled) return;
                             await createSchedule(booking);
+                            await handleUpdateBookingStatus(5)
                         }}
                     >
                         {openButtonText}
