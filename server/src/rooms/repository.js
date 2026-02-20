@@ -21,6 +21,7 @@ export async function findAllRooms() {
 
 export async function findBuildingAvailabilityByDateRange(startDate, endDate) {
   const TOTAL_SLOTS_PER_ROOM = 26;
+  const SECONDS_PER_SLOT = 1800; // 30 นาทีต่อ 1 slot
 
   const rows = await sql`
     WITH date_series AS (
@@ -33,32 +34,34 @@ export async function findBuildingAvailabilityByDateRange(startDate, endDate) {
     room_count AS (
       SELECT count(*)::int AS total_rooms
       FROM room
-      WHERE is_bookable = true
+      WHERE is_bookable = true -- หรือเงื่อนไขที่คุณใช้ระบุห้องที่เปิดใช้
     ),
+    -- คำนวณจำนวน Slot ที่ถูกใช้ไปในแต่ละวันจากตาราง room_booking
     used_slot_per_day AS (
       SELECT
         booking_date,
-        count(*)::int AS used_slots
-      FROM booking_approved_slot
-      WHERE booking_date BETWEEN ${startDate} AND ${endDate}
+        SUM(
+          EXTRACT(EPOCH FROM ("end_dateTime" - "start_dateTime")) / ${SECONDS_PER_SLOT}
+        )::int AS used_slots
+      FROM public.room_booking
+      WHERE 
+        booking_date BETWEEN ${startDate} AND ${endDate}
+        AND status_id NOT IN (3, 4) -- สมมติ 3=Cancelled, 4=Rejected (ปรับตามจริง)
       GROUP BY booking_date
     )
     SELECT
-      date_series.booking_date AS booking_date,
+      ds.booking_date,
       round(
         (
-          (room_count.total_rooms * ${TOTAL_SLOTS_PER_ROOM}
-            - coalesce(used_slot_per_day.used_slots, 0)
-          )::numeric
-          / nullif((room_count.total_rooms * ${TOTAL_SLOTS_PER_ROOM}), 0)
+          (rc.total_rooms * ${TOTAL_SLOTS_PER_ROOM} - coalesce(usd.used_slots, 0))::numeric
+          / nullif((rc.total_rooms * ${TOTAL_SLOTS_PER_ROOM}), 0)
         ) * 100,
         2
       ) AS available_percent
-    FROM date_series
-    CROSS JOIN room_count
-    LEFT JOIN used_slot_per_day
-      ON used_slot_per_day.booking_date = date_series.booking_date
-    ORDER BY date_series.booking_date;
+    FROM date_series ds
+    CROSS JOIN room_count rc
+    LEFT JOIN used_slot_per_day usd ON usd.booking_date = ds.booking_date
+    ORDER BY ds.booking_date;
   `;
 
   return rows;

@@ -6,6 +6,7 @@ import roomRouter from "./rooms/route.js";
 import bookingRouter from "./bookings/route.js";
 import authRoute from "./auth/route.js";
 import iotRoute from "./iot/route.js";
+import { authenticate } from "./middleware/authMiddleware.js";
 
 const app = express();
 app.use(
@@ -21,8 +22,8 @@ app.use(express.json());
 app.get("/health", (req, res) => res.json({ ok: true }));
 app.use("/api/auth", authRoute);
 
-app.use("/api/rooms", roomRouter);
-app.use("/api/booking", bookingRouter);
-app.use("/api/iot", iotRoute);
+app.use("/api/rooms", authenticate, roomRouter);
+app.use("/api/booking", authenticate, bookingRouter);
+app.use("/api/iot", authenticate, iotRoute);
 
 export default app;

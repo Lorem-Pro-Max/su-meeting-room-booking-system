@@ -51,7 +51,7 @@ function Sidebar({ isMenuOpen }) {
                         }`}
                 >
                     <img src={Logout} className="w-[18px] h-[18px]" alt="logout" />
-                    {isMenuOpen && <p className="text-sm font-medium">Logout</p>}
+                    {isMenuOpen && <p className="text-sm font-medium">Logou5555t</p>}
                 </NavLink>
             </div>
         </div>

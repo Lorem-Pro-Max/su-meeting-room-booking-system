@@ -30,7 +30,6 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const showReBookingButton = (bookingStatus === "rejectedByAdmin" || bookingStatus === "canceledByAdmin")
     const cancelButtonDisabled = !["pending", "approved"].includes(bookingStatus);
 
-    console.log(booking)
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
         try {
@@ -88,8 +87,8 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
                     className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition ${openButtonDisabled ? "bg-[#52C41A] text-white!  cursor-not-allowed" : "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"}`}
                     onClick={async () => {
                         if (openButtonDisabled) return;
-                        await handleUpdateBookingStatus(5);
-                        await createSchedule();
+                        //await handleUpdateBookingStatus(5);
+                        await createSchedule(booking);
                     }}
                 >
                     {openButtonText}

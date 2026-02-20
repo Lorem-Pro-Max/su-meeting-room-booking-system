@@ -4,7 +4,7 @@ import BookingCard from './BookingCard';
 import dayjs from 'dayjs'
 
 
-function BookingListModal({ isModalOpen, setIsModalOpen, bookings, availabilityMap }) {
+function BookingListModal({ isModalOpen, setIsModalOpen, bookings, availabilityMap, loading }) {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -33,6 +33,7 @@ function BookingListModal({ isModalOpen, setIsModalOpen, bookings, availabilityM
                 footer={null}
                 onCancel={handleCancel}
                 centered
+                loading={loading}
             >
                 <div className='flex gap-2 pb-3'>
                     <div
@@ -47,7 +48,7 @@ function BookingListModal({ isModalOpen, setIsModalOpen, bookings, availabilityM
                 <div className="max-h-110 2xl:max-h-250 overflow-y-auto overflow-x-hidden space-y-4 px-2">
                     <BookingCard bookings={bookings} />
                 </div>
-            </Modal>
+            </Modal >
         </>
     );
 };

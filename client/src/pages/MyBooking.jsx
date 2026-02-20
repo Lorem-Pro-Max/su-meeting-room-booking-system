@@ -13,12 +13,10 @@ export default function MyBooking() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const userInfo = getCurrentUser()
 
-  console.log("user", userInfo)
-
   const fetchMyBookings = async () => {
     try {
       setLoading(true);
-      const data = await getMyBookings(userInfo.id);
+      const data = await getMyBookings();
       setMyBookings(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error(err.message);

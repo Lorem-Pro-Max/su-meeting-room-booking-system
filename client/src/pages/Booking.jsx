@@ -43,7 +43,7 @@ export default function Booking() {
       <div className="flex flex-col sm:flex-row h-full">
         <div className="flex flex-col gap-5 h-full w-full">
           <BookingHeader />
-          <BookingCalendar date={date} setDate={setDate} bookings={bookings} />
+          <BookingCalendar date={date} setDate={setDate} bookings={bookings} loading={loading} />
         </div>
         <BookingForm date={date} setDate={setDate} bookings={bookings} rooms={rooms} loading={loading} setLoading={setLoading} />
       </div>

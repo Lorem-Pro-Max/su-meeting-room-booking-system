@@ -29,11 +29,11 @@ export async function getBookingOnDate(req, res) {
   }
 }
 
-/* booking ของฉัน (ยังไม่มี auth) */
 export async function getMyBooking(req, res) {
   try {
-    const { requester_id } = req.query;
-    const data = await findMyBookings(requester_id);
+    const userId = req.user.id;
+
+    const data = await findMyBookings(userId);
     res.json({ count: data.length, data });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -43,7 +43,12 @@ export async function getMyBooking(req, res) {
 /* create */
 export async function createBooking(req, res) {
   try {
-    const booking = await insertBooking(req.body);
+    const userId = req.user.id;
+    const bookingData = {
+      ...req.body,
+      requester_id: userId,
+    };
+    const booking = await insertBooking(bookingData);
     res.status(201).json({ data: booking });
   } catch (e) {
     res.status(500).json({ error: e.message });
@@ -53,8 +58,9 @@ export async function createBooking(req, res) {
 /* cancel / checkin / admin update */
 export async function updateStatus(req, res) {
   try {
+    const action_by = req.user.id;
     const { id } = req.params;
-    const { status_id, action_by, reason } = req.body;
+    const { status_id, reason } = req.body;
 
     const booking = await updateBookingStatus(
       id,
@@ -73,8 +79,9 @@ export async function updateNotiStatus(req, res) {
   try {
     const { id } = req.params;
     const status = req.body;
+    const userId = req.user.id;
 
-    const result = await updateBookingNotiStatus(id, status);
+    const result = await updateBookingNotiStatus(id, status, userId);
 
     res.json({ data: result });
   } catch (e) {

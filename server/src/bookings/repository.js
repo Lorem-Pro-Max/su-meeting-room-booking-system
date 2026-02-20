@@ -108,12 +108,12 @@ export async function updateBookingStatus(id, statusId, actionBy, reason) {
   return row;
 }
 
-export async function updateBookingNotiStatus(id, status) {
+export async function updateBookingNotiStatus(id, status, userId) {
   const [row] = await sql`
     UPDATE room_booking
     SET
       is_notified = ${status.status}
-    WHERE id = ${id}
+    WHERE id = ${id} AND requester_id = ${userId}
   `;
   return row;
 }
