@@ -1,42 +1,47 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@font-face {
+  font-family: "Kanit";
+  src: url("/fonts/Kanit/Kanit-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+
+@import "tailwindcss";
+
+@theme {
+  /* กลุ่มที่ 1: Primary (กลุ่มเข้ม/หลัก) */
+  --color-primary-dark: #00474f; /* เข้ม (Deep) */
+  --color-primary-main: #08979c; /* ธรรมดา (Main) */
+
+  /* กลุ่มที่ 2: Mint (กลุ่มอ่อน/มินต์) */
+  --color-mint-dark: #13c2c2; /* เข้มของกลุ่มมินต์ (หรือสีหลักแบบสว่าง) */
+  --color-mint-light: #e6fffb; /* อ่อน (Lightest) */
+  --font-kanit: "Kanit", sans-serif;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.custom-booking-input.ant-input-affix-wrapper {
+  border: none !important; /* ปิดขอบทุกด้าน */
+  border-bottom: 2px solid #ffc53d !important; /* เส้นใต้สีเหลือง (Tailwind yellow-500) */
+  border-radius: 0 !important;
+  padding-bottom: 8px !important; /* เพิ่มระยะห่างระหว่างตัวหนังสือกับเส้นใต้ */
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+/* ปรับสไตล์ Placeholder ให้ตรงตามรูป (ตัวหนาและดำ) */
+.custom-booking-input .ant-input::placeholder {
+  color: #000000 !important; /* สีดำตามรูป */
+  font-weight: 600 !important; /* ตัวหนา */
+  font-size: 1.5rem !important; /* ขนาดใหญ่ */
 }
 
-.card {
-  padding: 2em;
+.custom-booking-input .ant-input {
+  color: #000000 !important; /* สีดำตามรูป */
+  font-weight: 600 !important; /* ตัวหนา */
+  font-size: 1.5rem !important; /* ขนาดใหญ่ */
 }
 
-.read-the-docs {
-  color: #888;
+html, body, #root {
+  font-family: "Kanit", sans-serif;
 }
