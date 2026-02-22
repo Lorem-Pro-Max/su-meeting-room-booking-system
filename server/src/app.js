@@ -11,8 +11,12 @@ import { authenticate } from "./middleware/authMiddleware.js";
 const app = express();
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173", // URL ของฝั่ง React
-    credentials: true, // อนุญาตให้รับ-ส่ง Cookie และ Authorization Header
+    origin: [
+      process.env.CLIENT_URL,
+      "http://localhost:8794", // เพิ่มพอร์ตที่เรารันจริง
+      "http://localhost:5173", // ของเดิมเวลารัน dev mode
+    ].filter(Boolean),
+    credentials: true,
   }),
 );
 
@@ -20,10 +24,10 @@ app.use(cookieParser());
 app.use(express.json());
 
 app.get("/health", (req, res) => res.json({ ok: true }));
-app.use("/api/auth", authRoute);
+app.use("/auth", authRoute);
 
-app.use("/api/rooms", authenticate, roomRouter);
-app.use("/api/booking", authenticate, bookingRouter);
-app.use("/api/iot", authenticate, iotRoute);
+app.use("/rooms", authenticate, roomRouter);
+app.use("/booking", authenticate, bookingRouter);
+app.use("/iot", authenticate, iotRoute);
 
 export default app;

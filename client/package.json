@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npx sirv-cli dist --port 8794 --host --single"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
