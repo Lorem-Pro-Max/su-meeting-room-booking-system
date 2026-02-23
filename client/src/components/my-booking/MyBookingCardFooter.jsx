@@ -8,6 +8,7 @@ import { updateBookingStatus } from '../../services/updateBookingStatus';
 import { createIotSchedule } from '../../services/createIotSchedule';
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'antd';
+import { addIotQueue } from '../../services/addIotQueueService';
 
 function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const navigate = useNavigate();
@@ -60,12 +61,32 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
     const createSchedule = async (booking) => {
         try {
             setLoading(true)
-            await createIotSchedule({
+            const schedules = await createIotSchedule({
                 booking_id: booking.id,
                 room_id: booking.room_id,
                 action_time: booking.start_datetime,
                 action: "on"
             })
+
+            for (const item of schedules) {
+                const res = await addIotQueue({
+                    deviceId: item.device_id,
+                    action: item.action,
+                    actionTime: item.action_time,
+                    bookingId: item.booking_id,
+                    scheduleId: item.id,
+                    actionBy: item.action_by
+                });
+
+                if (!res.success) {
+                    console.error("Queue failed for schedule:", item.id);
+                } else {
+                    console.log(
+                        `Queued schedule ${item.id} → jobId: ${res.jobId}`
+                    );
+                }
+            }
+
         } catch (error) {
             console.error("Create schedule failed:", error);
         } finally {

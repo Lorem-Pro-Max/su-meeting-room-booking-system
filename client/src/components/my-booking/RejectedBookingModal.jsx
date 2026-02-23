@@ -10,7 +10,6 @@ import dayjs from 'dayjs';
 
 function RejectedBookingModal({ onClose, booking, fetchMyBookings }) {
     const navigate = useNavigate();
-    console.log(booking)
     if (!booking) return null;
 
     const dateDisplay = dayjs(booking.start_datetime).format('DD MMM YYYY');

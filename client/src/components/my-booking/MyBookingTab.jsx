@@ -6,7 +6,6 @@ import { useMemo } from "react";
 
 
 export function MyBookingTab({ myBookings, setLoading, user }) {
-    console.log(myBookings)
     const visibleBookings = useMemo(() => {
         return myBookings?.filter((b) => !shouldHideBooking(b.booking_status));
     }, [myBookings]);
