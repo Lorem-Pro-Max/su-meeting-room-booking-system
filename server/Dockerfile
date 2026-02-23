@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci --only=production
+RUN rm -rf node_modules package-lock.json && npm install --only=production
 
 # Copy source code
 COPY . .

@@ -121,5 +121,3 @@ scripts/
 # Development files
 .eslintrc*
 .prettierrc*
-tailwind.config.js
-vite.config.js
