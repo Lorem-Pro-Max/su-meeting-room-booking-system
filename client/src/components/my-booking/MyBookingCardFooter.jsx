@@ -5,13 +5,20 @@ import dayjs from "dayjs";
 import { useState } from 'react';
 import CancelBookingModal from './CancleBookingModal';
 import { updateBookingStatus } from '../../services/updateBookingStatus';
+import { createIotSchedule } from '../../services/createIotSchedule';
+import { useNavigate } from "react-router-dom";
+import { Tooltip } from 'antd';
+import { addIotQueue } from '../../services/addIotQueueService';
 
-function MyBookingCardFooter({ booking, mode, setLoading }) {
-    console.log(booking)
+function MyBookingCardFooter({ booking, mode, setLoading, user }) {
+    const navigate = useNavigate();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const start = booking?.start_datetime ? dayjs(booking.start_datetime) : null;
     const end = booking?.end_datetime ? dayjs(booking.end_datetime) : null;
+    const now = dayjs();
+    const isLate = start ? now.isAfter(start) : false;
 
     const dateText = start ? start.format("DD MMM YYYY") : "-";
     const timeText = start && end ? `${start.format("HH:mm")}-${end.format("HH:mm")}` : "-";
@@ -19,12 +26,18 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
     const status = getStatusBadge(booking?.booking_status);
 
     const bookingStatus = booking?.booking_status;
-    const showActions = mode === "upcoming"; // คงไว้เหมือนเดิม
+    const showActions = mode === "upcoming";
+
     const showOpenButton = showActions && (bookingStatus === "approved" || bookingStatus === "checked-in");
-    const openButtonDisabled = bookingStatus === "checked-in";
+    const openButtonDisabled = bookingStatus === "checked-in" || isLate;
     const openButtonText = bookingStatus === "checked-in" ? "เปิดห้องประชุมแล้ว" : "เปิดห้องประชุม";
     const showCancelButton = showActions && (bookingStatus === "pending" || bookingStatus === "approved" || bookingStatus === "checked-in");
-    const cancelButtonDisabled = bookingStatus !== "pending";
+    const showReBookingButton = (bookingStatus === "rejectedByAdmin" || bookingStatus === "canceledByAdmin")
+    const cancelButtonDisabled = !["pending", "approved"].includes(bookingStatus);
+
+    const disabledReason = isLate
+        ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาที่จองไว้ กรุณาติดต่อเจ้าหน้าที่"
+        : "";
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
         try {
@@ -33,17 +46,54 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
             await updateBookingStatus({
                 bookingId: booking.id,
                 statusId: statusId,
-                actionBy: Number(booking.requester_id),
+                actionBy: user.id,
                 reason: reason,
             });
 
             setIsModalOpen(false);
+        } catch (error) {
+            console.error("Update booking failed:", error);
         } finally {
             setLoading(false);
         }
     };
 
-    console.log(booking)
+    const createSchedule = async (booking) => {
+        try {
+            setLoading(true)
+            const schedules = await createIotSchedule({
+                booking_id: booking.id,
+                room_id: booking.room_id,
+                action_time: booking.start_datetime,
+                action: "on"
+            })
+
+            for (const item of schedules) {
+                const res = await addIotQueue({
+                    deviceId: item.device_id,
+                    action: item.action,
+                    actionTime: item.action_time,
+                    bookingId: item.booking_id,
+                    scheduleId: item.id,
+                    actionBy: item.action_by
+                });
+
+                if (!res.success) {
+                    console.error("Queue failed for schedule:", item.id);
+                } else {
+                    console.log(
+                        `Queued schedule ${item.id} → jobId: ${res.jobId}`
+                    );
+                }
+            }
+
+        } catch (error) {
+            console.error("Create schedule failed:", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (<div className="flex flex-col sm:flex-row p-4 justify-between rounded-b-lg gap-3">
         <div className="flex sm:flex-row flex-col gap-2 sm:items-center">
             <div className="flex gap-2 items-center">
@@ -60,16 +110,26 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             {showOpenButton && (
-                <button
-                    disabled={openButtonDisabled}
-                    className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition ${openButtonDisabled ? "bg-[#52C41A] text-white!  cursor-not-allowed" : "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"}`}
-                    onClick={() => {
-                        if (openButtonDisabled) return;
-                        handleUpdateBookingStatus(5)
-                    }}
-                >
-                    {openButtonText}
-                </button>
+                <Tooltip title={isLate ? disabledReason : ""}>
+                    <button
+                        disabled={openButtonDisabled}
+                        className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition 
+                            ${!openButtonDisabled
+                                ? "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer" // สถานะปกติ
+                                : (bookingStatus === "checked-in"
+                                    ? "bg-[#52C41A] text-white! cursor-not-allowed" // เขียวสด (Check-in แล้ว)
+                                    : "bg-[#52C41A]/40 text-white! cursor-not-allowed" // เขียวซีด (Disable เพราะ Late)
+                                )
+                            }`}
+                        onClick={async () => {
+                            if (openButtonDisabled) return;
+                            await createSchedule(booking);
+                            await handleUpdateBookingStatus(5)
+                        }}
+                    >
+                        {openButtonText}
+                    </button>
+                </Tooltip>
             )}
 
             {showCancelButton && (
@@ -82,6 +142,16 @@ function MyBookingCardFooter({ booking, mode, setLoading }) {
                     }}
                 >
                     ยกเลิกการจอง
+                </button>
+            )}
+            {showReBookingButton && (
+                <button
+                    className={`w-full sm:w-auto rounded-lg border py-2 px-4 font-medium transition border-mint-dark text-gray-800 hover:bg-mint-dark hover:text-white! cursor-pointer`}
+                    onClick={() => {
+                        navigate("/");
+                    }}
+                >
+                    จองใหม่อีกครั้ง
                 </button>
             )}
         </div>

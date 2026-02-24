@@ -5,6 +5,7 @@ import MyBooking from "./pages/MyBooking";
 import Login from "./pages/Login";
 import Booking from "./pages/Booking";
 import { ConfigProvider } from "antd";
+import ProtectedRoute from "./components/ProtectRoute";
 
 function App() {
 
@@ -15,25 +16,24 @@ function App() {
     },
   };
   return (
-    <>
-      <ConfigProvider theme={theme}>
-        <Routes>
-          <Route
-            path="/*"
-            element={
+    <ConfigProvider theme={theme}>
+      <Routes>
+        <Route path="login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
               <Layout>
                 <Routes>
                   <Route index element={<Booking />} />
                   <Route path="my-booking" element={<MyBooking />} />
                 </Routes>
               </Layout>
-
-            }
-          />
-          < Route path="login" element={< Login />} />
-        </Routes >
-      </ConfigProvider >
-    </>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </ConfigProvider>
   );
 }
 

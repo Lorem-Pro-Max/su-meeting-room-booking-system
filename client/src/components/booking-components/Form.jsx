@@ -10,10 +10,11 @@ import BookingCard from "./BookingModal/BookingCard";
 import PhoneInput from "./PhoneInput";
 import { SubmitModalBody } from "./SubmitModalBody";
 import ModalImage from "../../assets/image/notebookModal.png"
+import { getCurrentUser } from "../../utils/getCurrentUser";
 
 function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
   const [form] = Form.useForm();
-  const userInfo = getInitialUser()
+  const userInfo = getCurrentUser()
   const [formData, setFormData] = useState({
     title: "",
     userId: userInfo?.id || null,
@@ -63,7 +64,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
             },
           }}
         >
-          <Form layout="vertical" className="flex flex-col gap-2 " initialValues={{
+          <Form form={form} layout="vertical" className="flex flex-col gap-2 " initialValues={{
             user: formData.userName, // แสดงชื่อผู้จองทันที
             date: date
           }}>
@@ -157,15 +158,3 @@ function DateInput({ date, setDate, }) {
 
 
 export default BookingForm;
-
-const getInitialUser = () => {
-  const savedUser = localStorage.getItem('user');
-  if (savedUser) {
-    try {
-      return JSON.parse(savedUser);
-    } catch (e) {
-      return null;
-    }
-  }
-  return null;
-};

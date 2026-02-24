@@ -9,24 +9,21 @@ import LogoutModal from "./LogoutModal";
 import { useState } from "react";
 
 function Sidebar({ isMenuOpen }) {
-  const location = useLocation();
   const navigate = useNavigate();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
+
       await logoutService();
-
-      sessionStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-
-      message.success("ออกจากระบบเรียบร้อย");
-
-      navigate("/login");
     } catch (err) {
-      console.error("Logout failed:", err);
-      sessionStorage.clear();
+      console.error("Server logout failed, clearing local data anyway:", err);
+    } finally {
+
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
       localStorage.clear();
+
       navigate("/login");
     }
   };

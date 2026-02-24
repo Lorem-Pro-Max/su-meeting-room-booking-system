@@ -4,7 +4,7 @@ import BookingListModal from "./BookingModal/BookingListModal";
 import { useBuildingAvailability } from "../../hooks/booking";
 import dayjs from "dayjs";
 
-function BookingCalendar({ date, setDate, bookings }) {
+function BookingCalendar({ date, setDate, bookings, loading }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { useBreakpoint } = Grid;
@@ -14,7 +14,6 @@ function BookingCalendar({ date, setDate, bookings }) {
   const {
     availabilityMap,
     fetchAvailability,
-    loading,
   } = useBuildingAvailability();
 
 
@@ -56,7 +55,7 @@ function BookingCalendar({ date, setDate, bookings }) {
       </style>
 
     </div >
-    <BookingListModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} bookings={bookings} availabilityMap={availabilityMap} /></>
+    <BookingListModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} bookings={bookings} availabilityMap={availabilityMap} loading={loading} /></>
   );
 }
 

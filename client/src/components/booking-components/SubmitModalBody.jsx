@@ -1,8 +1,11 @@
 import Building from "../../assets/icon/building.svg";
 import dayjs from "dayjs"
 import { createBooking } from "../../services/createBooking"
+import { useNavigate } from "react-router-dom";
+import { notification } from 'antd';
 
 export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) {
+    const navigate = useNavigate()
     const handleSubmit = async (form) => {
         try {
             setLoading(true)
@@ -44,9 +47,35 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
             };
 
             const result = await createBooking(payload);
+            notification.success({
+                message: 'ส่งคำขอการจองห้องสำเร็จแล้ว',
+                description: `โปรดรอเจ้าหน้าที่ตรวจสอบและอนุมัติการจองของคุณ`,
+                placement: 'topRight',
+                duration: 3,
+                style: {
+                    backgroundColor: '#F6FFED', // พื้นหลังเขียวอ่อน
+                    border: '1px solid #B7EB8F', // ขอบเขียว
+                    borderRadius: '8px',
+                    fontFamily: 'Kanit, sans-serif',
+                },
+            });
+            setIsSubmitModalOpen(false);
             setLoading(false)
+            navigate("/my-booking");
         } catch (err) {
             setLoading(false)
+            notification.error({
+                message: 'ส่งคำขอการจองห้องไม่สำเร็จ',
+                description: 'กรุณาลองหใม่อีกครั้ง หรือติดต่อเจ้าหน้าที่',
+                placement: 'topRight',
+                duration: 4,
+                style: {
+                    backgroundColor: '#FFF1F0', // พื้นหลังแดง/ชมพูอ่อน
+                    border: '1px solid #FFCCC7', // ขอบแดงอ่อน
+                    borderRadius: '8px',
+                    fontFamily: 'Kanit, sans-serif',
+                },
+            });
             console.error(err.message);
         }
     };
@@ -94,8 +123,14 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
                 </div>
             </div>
             <div className="w-full flex flex-col gap-2">
-                <button className="w-full rounded-lg bg-mint-dark py-2 text-white! hover:cursor-pointer"
-                    onClick={() => { handleSubmit(formData) }}>ยืนยันการจอง</button>
+                <button
+                    className="w-full rounded-lg bg-mint-dark py-2 text-white! hover:cursor-pointer"
+                    onClick={async () => {
+                        await handleSubmit(formData)
+                        navigate("/my-booking")
+                    }}>
+                    ยืนยันการจอง
+                </button>
                 <button className="w-full rounded-lg border border-[#D9D9D9] py-2 text-white hover:cursor-pointer" onClick={() => { setIsSubmitModalOpen(false) }}>แก้ไขข้อมูลการจอง</button>
             </div>
         </div>)

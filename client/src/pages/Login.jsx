@@ -1,14 +1,12 @@
-import loginBg from "../assets/image/loginBg.png"
+import loginBg from "../assets/image/login.png"
 import LoginForm from "../components/login/LoginForm";
 
 export default function Login() {
   return (
     <>
-      <div className="w-screen min-h-screen overflow-hidden relative">
-        <img src={loginBg} className="absolute w-full h-full object-cover" />
-        <div className="absolute z-10 w-full h-full flex items-center justify-center sm:justify-center md:justify-end md:pr-20 lg:pr-32 xl:pr-40 px-4">
-          <LoginForm />
-        </div>
+      <div className="w-screen h-screen overflow-hidden relative flex flex-col sm:flex-row bg-amber-400">
+        <img src={loginBg} className="h-35 w-full sm:h-screen object-cover " />
+        <LoginForm />
       </div>
     </>
   );

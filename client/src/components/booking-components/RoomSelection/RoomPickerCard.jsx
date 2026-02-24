@@ -1,4 +1,5 @@
 import { PlusOutlined, CheckCircleFilled } from "@ant-design/icons";
+import BuildingIcon from "../../../assets/icon/building.svg"
 
 export default function RoomPickerCard({ rooms, formData, onOpenModal }) {
   const selectedRoomName = formData.room?.title
@@ -14,7 +15,7 @@ export default function RoomPickerCard({ rooms, formData, onOpenModal }) {
           }`}
       >
         {formData.room ? (
-          <CheckCircleFilled className="text-xl" />
+          <img src={BuildingIcon} className="w-7" />
         ) : (
           <PlusOutlined className="text-xl" />
         )}
