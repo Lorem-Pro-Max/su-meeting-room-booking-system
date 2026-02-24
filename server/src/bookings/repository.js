@@ -6,7 +6,7 @@ export async function findBookingsRange(from, to) {
     SELECT *
     FROM room_booking
     WHERE booking_date BETWEEN ${from} AND ${to}
-      AND status_id NOT IN (3, 4) -- ไม่เอา rejected / canceled
+      AND status_id NOT IN (3, 4)
     ORDER BY "start_dateTime"
   `;
 }

@@ -34,9 +34,9 @@ export async function findBuildingAvailabilityByDateRange(startDate, endDate) {
     room_count AS (
       SELECT count(*)::int AS total_rooms
       FROM room
-      WHERE is_bookable = true -- หรือเงื่อนไขที่คุณใช้ระบุห้องที่เปิดใช้
+      WHERE is_bookable = true 
     ),
-    -- คำนวณจำนวน Slot ที่ถูกใช้ไปในแต่ละวันจากตาราง room_booking
+    
     used_slot_per_day AS (
       SELECT
         booking_date,
@@ -46,7 +46,7 @@ export async function findBuildingAvailabilityByDateRange(startDate, endDate) {
       FROM public.room_booking
       WHERE 
         booking_date BETWEEN ${startDate} AND ${endDate}
-        AND status_id NOT IN (3, 4) -- สมมติ 3=Cancelled, 4=Rejected (ปรับตามจริง)
+        AND status_id NOT IN (3, 4) 
       GROUP BY booking_date
     )
     SELECT
