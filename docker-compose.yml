@@ -38,10 +38,11 @@ services:
       dockerfile: Dockerfile
       args:
         - VITE_API_BASE=${VITE_API_BASE}
+        - IOT_SERVICE_BASE_URL=${IOT_SERVICE_BASE_URL}
     container_name: su-meeting-frontend
     restart: unless-stopped
-    environment:
-      - VITE_API_BASE=${VITE_API_BASE}
-      - IOT_SERVICE_BASE_URL=${IOT_SERVICE_BASE_URL}
+    # environment:
+    #   - VITE_API_BASE=${VITE_API_BASE}
+    #   - IOT_SERVICE_BASE_URL=${IOT_SERVICE_BASE_URL}
     ports:
       - "8794:8794"
