@@ -13,8 +13,8 @@ function LogoutModal({ isLogoutModalOpen, setIsLogoutModalOpen, handleLogout }) 
             <div className='flex flex-col items-center justify-center'>
                 <div className='flex flex-col items-center justify-center'>
                     <img src={LogoutImage} />
-                    <p className='text-lg font-bold'>ยืนยันยกเลิกการจองนี้?</p>
-                    <p className='m-20 text-center'>ข้อมูลการจองนี้จะถูกลบออกจากระบบ หากต้องการใช้งานห้องอีกครั้ง กรุณาทำรายการจองใหม่</p>
+                    <p className='text-lg font-bold'>ยืนยันออกจากระบบ</p>
+                    <p className='m-20 text-center'>คุณต้องการออกจากระบบใช่ไหม?</p>
                 </div>
                 <div className="w-full flex flex-col sm:flex-row gap-2 pt-5">
                     <button
@@ -28,7 +28,7 @@ function LogoutModal({ isLogoutModalOpen, setIsLogoutModalOpen, handleLogout }) 
                         className="w-full sm:w-1/2 rounded-lg h-10 transition bg-mint-dark hover:bg-teal-600 text-white! cursor-pointer"
                         onClick={handleLogout}
                     >
-                        ยืนยัน
+                        ออกจากระบบ
                     </button>
                 </div>
             </div>
