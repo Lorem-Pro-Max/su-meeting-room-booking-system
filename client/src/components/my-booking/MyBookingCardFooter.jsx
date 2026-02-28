@@ -18,7 +18,13 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
     const start = booking?.start_datetime ? dayjs(booking.start_datetime) : null;
     const end = booking?.end_datetime ? dayjs(booking.end_datetime) : null;
     const now = dayjs();
-    const isLate = start ? now.isAfter(start) : false;
+    const checkinStart = start ? start.subtract(30, "minute") : null;
+    const checkinEnd = end ?? null;
+
+    const isBeforeWindow = checkinStart ? now.isBefore(checkinStart) : true;
+    const isAfterWindow = checkinEnd ? now.isAfter(checkinEnd) : false;
+
+    const isOutsideCheckinWindow = isBeforeWindow || isAfterWindow;
 
     const dateText = start ? start.format("DD MMM YYYY") : "-";
     const timeText = start && end ? `${start.format("HH:mm")}-${end.format("HH:mm")}` : "-";
@@ -29,15 +35,17 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
     const showActions = mode === "upcoming";
 
     const showOpenButton = showActions && (bookingStatus === "approved" || bookingStatus === "checked-in");
-    const openButtonDisabled = bookingStatus === "checked-in" || isLate;
+    const openButtonDisabled = bookingStatus === "checked-in" || isOutsideCheckinWindow;
     const openButtonText = bookingStatus === "checked-in" ? "เปิดห้องประชุมแล้ว" : "เปิดห้องประชุม";
     const showCancelButton = showActions && (bookingStatus === "pending" || bookingStatus === "approved" || bookingStatus === "checked-in");
     const showReBookingButton = (bookingStatus === "rejectedByAdmin" || bookingStatus === "canceledByAdmin")
     const cancelButtonDisabled = !["pending", "approved"].includes(bookingStatus);
 
-    const disabledReason = isLate
-        ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาที่จองไว้ กรุณาติดต่อเจ้าหน้าที่"
-        : "";
+    const disabledReason = isOutsideCheckinWindow
+        ? "สามารถเปิดห้องได้ล่วงหน้า 30 นาที"
+        : isAfterWindow
+            ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาการจองแล้ว"
+            : "";
 
     const handleUpdateBookingStatus = async (statusId, reason = null) => {
         try {
@@ -112,7 +120,7 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             {showOpenButton && (
-                <Tooltip title={isLate ? disabledReason : ""}>
+                <Tooltip title={isOutsideCheckinWindow ? disabledReason : ""}>
                     <button
                         disabled={openButtonDisabled}
                         className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition 
