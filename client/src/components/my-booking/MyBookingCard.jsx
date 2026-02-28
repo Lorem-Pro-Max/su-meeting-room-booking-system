@@ -3,7 +3,7 @@ import MyBookingCardBody from "./MyBookingCardBody";
 import MyBookingCardFooter from "./MyBookingCardFooter";
 import noBookingImage from "../../assets/image/no-booking.png";
 
-function MyBookingCard({ myBookings, mode, setLoading, user }) {
+function MyBookingCard({ myBookings, mode, setLoading, user, fetchMyBookings }) {
   if (!Array.isArray(myBookings) || myBookings?.length === 0) {
     return (
       <div className="flex flex-col items-center">
@@ -25,6 +25,7 @@ function MyBookingCard({ myBookings, mode, setLoading, user }) {
             mode={mode}
             setLoading={setLoading}
             user={user}
+            fetchMyBookings={fetchMyBookings}
           />
         </div>
       ))}

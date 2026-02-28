@@ -48,7 +48,12 @@ export default function MyBooking() {
       <Spin spinning={loading} indicator={<LoadingOutlined spin />} size="large" tip="Loading" fullscreen />
       <div className="bg-white w-full min-h-full ml-4 px-7 py-6">
         <p className="text-2xl">การจองของฉัน</p>
-        <MyBookingTab myBookings={myBookings} setLoading={setLoading} user={userInfo} />
+        <MyBookingTab
+          myBookings={myBookings}
+          setLoading={setLoading}
+          user={userInfo}
+          fetchMyBookings={fetchMyBookings}
+        />
       </div>
       {selectedBooking && (<RejectedBookingModal
         booking={selectedBooking}

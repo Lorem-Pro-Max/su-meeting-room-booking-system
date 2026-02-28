@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'antd';
 import { addIotQueue } from '../../services/addIotQueueService';
 
-function MyBookingCardFooter({ booking, mode, setLoading, user }) {
+function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings }) {
     const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,6 +49,8 @@ function MyBookingCardFooter({ booking, mode, setLoading, user }) {
                 actionBy: user.id,
                 reason: reason,
             });
+
+            await fetchMyBookings();
 
             setIsModalOpen(false);
         } catch (error) {
