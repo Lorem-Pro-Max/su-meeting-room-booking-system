@@ -23,7 +23,6 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
 
     const isBeforeWindow = checkinStart ? now.isBefore(checkinStart) : true;
     const isAfterWindow = checkinEnd ? now.isAfter(checkinEnd) : false;
-
     const isOutsideCheckinWindow = isBeforeWindow || isAfterWindow;
 
     const dateText = start ? start.format("DD MMM YYYY") : "-";
@@ -71,10 +70,21 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
     const createSchedule = async (booking) => {
         try {
             setLoading(true)
+
+            const now = dayjs();
+            const start = dayjs(booking.start_datetime);
+
+            const actionTime = now.isAfter(start)
+                ? now.toISOString()
+                : booking.start_datetime;
+
+            console.log(booking.start_datetime)
+            console.log(actionTime)
+
             const schedules = await createIotSchedule({
                 booking_id: booking.id,
                 room_id: booking.room_id,
-                action_time: booking.start_datetime,
+                action_time: actionTime,
                 action: "on"
             })
 
