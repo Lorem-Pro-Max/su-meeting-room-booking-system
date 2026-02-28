@@ -1,9 +1,16 @@
 import { Form, Select, Checkbox, } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 
-function TimeInput({ setFormData }) {
-    const timeSlots = generateTimeSlots();
+dayjs.extend(isSameOrBefore);
+
+function TimeInput({ setFormData, date }) {
+    const selectedDate = date ? dayjs(date) : null;
+    const now = dayjs();
+
+    const timeSlots = generateTimeSlots(selectedDate, now);
+
     const form = Form.useFormInstance();
     const selectedTimes = Form.useWatch("time", form) || [];
 
@@ -53,7 +60,6 @@ function TimeInput({ setFormData }) {
         }
     };
 
-
     return (
         <Form.Item
             label={<span>เวลาที่ต้องการจอง</span>}
@@ -82,6 +88,7 @@ function TimeInput({ setFormData }) {
                                 >
                                     <Checkbox
                                         checked={isSelected}
+                                        disabled={time.disabled}
                                         className="w-full text-gray-600 pointer-events-none"
                                     >
                                         <span className={isSelected ? "text-teal-700 font-medium" : ""}>
@@ -100,20 +107,33 @@ function TimeInput({ setFormData }) {
 
 export default TimeInput
 
-const generateTimeSlots = () => {
+const generateTimeSlots = (selectedDate, now) => {
     const slots = [];
+
     let start = dayjs().hour(8).minute(0);
     const endLimit = dayjs().hour(21).minute(0);
 
     while (start.isBefore(endLimit)) {
-        const next = start.add(30, 'minute');
+        const next = start.add(30, "minute");
+
+        let isDisabled = false;
+
+        if (selectedDate && selectedDate.isSame(now, "day")) {
+            if (next.isSameOrBefore(now)) {
+                isDisabled = true;
+            }
+        }
+
         slots.push({
             value: start.format("HH:mm"),
             label: `${start.format("HH:mm")} - ${next.format("HH:mm")} น.`,
             start: start.format("HH:mm"),
-            end: next.format("HH:mm")
+            end: next.format("HH:mm"),
+            disabled: isDisabled
         });
+
         start = next;
     }
+
     return slots;
 };

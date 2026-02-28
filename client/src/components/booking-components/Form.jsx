@@ -85,7 +85,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
                 <PhoneInput setFormData={setFormData} />
               </Col>
             </Row>
-            <TimeInput setFormData={setFormData} />
+            <TimeInput setFormData={setFormData} date={date} />
           </Form>
         </ConfigProvider>
         <Divider></Divider>
