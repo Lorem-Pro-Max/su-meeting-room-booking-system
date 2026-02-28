@@ -13,7 +13,7 @@ export async function findAllRooms() {
   LEFT JOIN building
     ON building.id = room.building_id
   WHERE is_bookable = true
-  ORDER BY room.floor, room.id
+  ORDER BY room.title ASC
 `;
 
   return rooms;
