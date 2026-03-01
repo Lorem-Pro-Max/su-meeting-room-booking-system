@@ -85,7 +85,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
                 <PhoneInput setFormData={setFormData} />
               </Col>
             </Row>
-            <TimeInput setFormData={setFormData} />
+            <TimeInput setFormData={setFormData} date={date} />
           </Form>
         </ConfigProvider>
         <Divider></Divider>
@@ -149,9 +149,18 @@ function DateInput({ date, setDate, }) {
   };
   const dateFormat = 'DD MMM YYYY';
 
+  const disablePastDates = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+
   return (
     <Form.Item label="วันที่" name="date" initialValue={date} required>
-      <DatePicker format={dateFormat} onChange={handleChange} className="w-full" />
+      <DatePicker
+        format={dateFormat}
+        onChange={handleChange}
+        className="w-full"
+        disabledDate={disablePastDates}
+      />
     </Form.Item>
   );
 }
