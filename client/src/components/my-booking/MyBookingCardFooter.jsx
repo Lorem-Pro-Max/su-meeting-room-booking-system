@@ -71,12 +71,8 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
         try {
             setLoading(true)
 
-            const now = dayjs();
-            const start = dayjs(booking.start_datetime);
-
-            const actionTime = now.isAfter(start)
-                ? now.toISOString()
-                : booking.start_datetime;
+            const actionTime = dayjs().toISOString()
+            const actionTimeForIotQueue = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
             const schedules = await createIotSchedule({
                 booking_id: booking.id,
@@ -89,7 +85,7 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
                 const res = await addIotQueue({
                     deviceId: item.device_id,
                     action: item.action,
-                    actionTime: item.action_time,
+                    actionTime: actionTimeForIotQueue,
                     bookingId: item.booking_id,
                     scheduleId: item.id,
                     actionBy: item.action_by
@@ -132,10 +128,10 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
                         disabled={openButtonDisabled}
                         className={`w-full sm:w-auto rounded-lg py-2 px-4 font-medium transition 
                             ${!openButtonDisabled
-                                ? "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer" // สถานะปกติ
+                                ? "bg-mint-dark text-white! hover:bg-primary-main cursor-pointer"
                                 : (bookingStatus === "checked-in"
-                                    ? "bg-[#52C41A] text-white! cursor-not-allowed" // เขียวสด (Check-in แล้ว)
-                                    : "bg-[#52C41A]/40 text-white! cursor-not-allowed" // เขียวซีด (Disable เพราะ Late)
+                                    ? "bg-[#52C41A] text-white! cursor-not-allowed"
+                                    : "bg-[#52C41A]/40 text-white! cursor-not-allowed"
                                 )
                             }`}
                         onClick={async () => {
