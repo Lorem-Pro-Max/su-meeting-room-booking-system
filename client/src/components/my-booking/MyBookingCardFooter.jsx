@@ -78,9 +78,6 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
                 ? now.toISOString()
                 : booking.start_datetime;
 
-            console.log(booking.start_datetime)
-            console.log(actionTime)
-
             const schedules = await createIotSchedule({
                 booking_id: booking.id,
                 room_id: booking.room_id,
