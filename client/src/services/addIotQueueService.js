@@ -21,3 +21,25 @@ export const addIotQueue = async (data) => {
     throw error;
   }
 };
+
+export const setActiveRoom = async (data) => {
+  try {
+    const response = await api.post(
+      `${IOT_BASE_URL}/api/iot-queue/set-active-room`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Set Active Room Error:",
+      error.response?.data || error.message,
+    );
+    throw error;
+  }
+};

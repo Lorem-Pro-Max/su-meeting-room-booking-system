@@ -8,9 +8,10 @@ import { updateBookingStatus } from '../../services/updateBookingStatus';
 import { createIotSchedule } from '../../services/createIotSchedule';
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from 'antd';
-import { addIotQueue } from '../../services/addIotQueueService';
+import { addIotQueue, setActiveRoom } from '../../services/addIotQueueService';
 
 function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings }) {
+
     const navigate = useNavigate();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -72,7 +73,6 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
             setLoading(true)
 
             const actionTime = dayjs().toISOString()
-            const actionTimeForIotQueue = dayjs().format("YYYY-MM-DD HH:mm:ss");
 
             const schedules = await createIotSchedule({
                 booking_id: booking.id,
@@ -99,6 +99,10 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
                     );
                 }
             }
+            await setActiveRoom({
+                room_id: booking.room_id,
+                end_dateTime: dayjs(booking.end_datetime)
+            });
 
         } catch (error) {
             console.error("Create schedule failed:", error);
