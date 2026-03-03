@@ -25,3 +25,15 @@ export const deleteRefreshToken = async (token) => {
         WHERE token = ${token}
     `;
 };
+
+export const findUserById = async (id) => {
+  const result = await sql`
+    SELECT 
+      u.*, 
+      us.name AS status_name
+    FROM "user" u
+    JOIN user_status us ON u.status = us.id
+    WHERE u.id = ${id}
+  `;
+  return result[0];
+};
