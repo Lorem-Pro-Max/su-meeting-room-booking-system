@@ -85,7 +85,7 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
                 const res = await addIotQueue({
                     deviceId: item.device_id,
                     action: item.action,
-                    actionTime: actionTimeForIotQueue,
+                    actionTime: actionTime,
                     bookingId: item.booking_id,
                     scheduleId: item.id,
                     actionBy: item.action_by
