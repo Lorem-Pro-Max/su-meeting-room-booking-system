@@ -15,6 +15,12 @@ export const login = async (req, res) => {
         .status(401)
         .json({ message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง" });
 
+    if (user.status_name === "inactive") {
+      return res.status(403).json({
+        message: "บัญชีของคุณไม่สามารถเข้าสู่ระบบได้ กรุณาติดต่อผู้ดูแลระบบ",
+      });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res
