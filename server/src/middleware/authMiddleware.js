@@ -7,20 +7,9 @@ export const authenticate = async (req, res, next) => {
 
   if (!token) return res.status(401).json({ message: "Unauthorized" });
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-
-    const user = await findUserById(decoded.id);
-
-    if (!user || user.status_name === "inactive") {
-      return res.status(403).json({
-        message: "บัญชีถูกระงับ กรุณาเข้าสู่ระบบใหม่",
-      });
-    }
-
-    req.user = decoded;
+  jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Access Token Expired" });
+    req.user = user;
     next();
-  } catch (err) {
-    return res.status(403).json({ message: "Access Token Expired" });
-  }
+  });
 };
