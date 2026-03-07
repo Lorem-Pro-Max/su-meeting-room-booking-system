@@ -33,7 +33,6 @@ function Sidebar({ isMenuOpen }) {
       className={`${isMenuOpen ? "flex" : "hidden"} md:flex h-full py-6 flex-col justify-between items-center bg-white transition-all duration-300 ${isMenuOpen ? "w-66" : "w-18"}`}
     >
       <div className="flex flex-col gap-4 w-full px-3">
-        {/* เมนูที่ 1 */}
         <NavLink
           to="/"
           className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
@@ -47,7 +46,6 @@ function Sidebar({ isMenuOpen }) {
           )}
         </NavLink>
 
-        {/* เมนูที่ 2 */}
         <NavLink
           to="/my-booking"
           className={`group flex items-center gap-3 h-10 rounded-lg cursor-pointer text-primary-dark hover:bg-mint-light hover:text-primary-main transition-colors ${isMenuOpen ? "px-4 justify-start" : "justify-center"
