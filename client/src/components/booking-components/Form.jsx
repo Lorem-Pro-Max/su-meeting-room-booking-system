@@ -1,9 +1,10 @@
 import { Form, Input, DatePicker, Row, Col, Divider, ConfigProvider, Modal, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import dayjs from 'dayjs';
 import RoomSelection from "./RoomSelection/RoomSelection"
+import { getRoomIdsBookedInRange } from "../../utils/bookingAvailability";
 import TitleInput from "./TitleInput";
 import TimeInput from "./TimeInput";
 import BookingCard from "./BookingModal/BookingCard";
@@ -30,12 +31,24 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false)
 
 
+  const dateStr = date ? dayjs(date).format("YYYY-MM-DD") : "";
+  const disabledRoomIds = useMemo(() => {
+    if (!dateStr || !formData.startTime || !formData.endTime) return new Set();
+    return getRoomIdsBookedInRange(bookings, dateStr, formData.startTime, formData.endTime);
+  }, [bookings, dateStr, formData.startTime, formData.endTime]);
+
   useEffect(() => {
     if (date) {
       setFormData((prev) => ({ ...prev, selectedDate: date }));
       form.setFieldsValue({ date: date });
     }
   }, [date]);
+
+  useEffect(() => {
+    if (formData.room && disabledRoomIds.has(Number(formData.room.id))) {
+      setFormData((prev) => ({ ...prev, room: null }));
+    }
+  }, [disabledRoomIds]);
 
   const preSubmitCheck = async () => {
     try {
@@ -75,6 +88,8 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
               isModalOpen={isModalOpen}
               setIsModalOpen={setIsModalOpen}
               rooms={rooms}
+              bookings={bookings}
+              selectedDate={date}
             />
             <UserInfo />
             <Row gutter={16}>
@@ -85,7 +100,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
                 <PhoneInput setFormData={setFormData} />
               </Col>
             </Row>
-            <TimeInput setFormData={setFormData} date={date} />
+            <TimeInput setFormData={setFormData} date={date} bookings={bookings} selectedRoom={formData.room} />
           </Form>
         </ConfigProvider>
         <Divider></Divider>
@@ -154,7 +169,7 @@ function DateInput({ date, setDate, }) {
   };
 
   return (
-    <Form.Item label="วันที่" name="date" initialValue={date} required>
+    <Form.Item label="วันที่" name="date" required>
       <DatePicker
         format={dateFormat}
         onChange={handleChange}

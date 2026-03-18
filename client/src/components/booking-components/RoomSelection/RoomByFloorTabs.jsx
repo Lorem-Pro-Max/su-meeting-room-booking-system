@@ -8,6 +8,7 @@ export default function RoomsByFloorTabs({
   roomsGroupedByFloor,
   tempSelectedRoom,
   onSelectTempRoom,
+  disabledRoomIds = new Set(),
 }) {
   const floorTabItems = useMemo(() => {
     const sortedFloors = Array.from(roomsGroupedByFloor.keys()).sort(
@@ -27,13 +28,22 @@ export default function RoomsByFloorTabs({
         children: (
           <div className="overflow-y-auto overflow-x-hidden p-4 bg-[#F5F5F5] rounded-2xl">
             <Row gutter={[12, 12]}>
-              {roomsOnThisFloor.map((roomItem) => <RoomCard key={roomItem.id ?? `${roomItem.floor}-${roomItem.title ?? roomItem.name}`} roomItem={roomItem} floorKey={floorKey} tempSelectedRoom={tempSelectedRoom} onSelectTempRoom={onSelectTempRoom} />)}
+              {roomsOnThisFloor.map((roomItem) => (
+                <RoomCard
+                  key={roomItem.id ?? `${roomItem.floor}-${roomItem.title ?? roomItem.name}`}
+                  roomItem={roomItem}
+                  floorKey={floorKey}
+                  tempSelectedRoom={tempSelectedRoom}
+                  onSelectTempRoom={onSelectTempRoom}
+                  disabled={disabledRoomIds.has(Number(roomItem.id))}
+                />
+              ))}
             </Row>
           </div>
         ),
       };
     });
-  }, [roomsGroupedByFloor, tempSelectedRoom, onSelectTempRoom]);
+  }, [roomsGroupedByFloor, tempSelectedRoom, onSelectTempRoom, disabledRoomIds]);
 
   return (
     <Tabs
