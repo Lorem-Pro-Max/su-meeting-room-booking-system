@@ -26,6 +26,10 @@ function BookingCalendar({ date, setDate, bookings, loading }) {
     setDate(newValue);
   };
 
+  const disabledDate = (current) => {
+    return current && current < dayjs().startOf("day");
+  };
+
   useEffect(() => {
     if (date) { fetchAvailability(date); }
   }, [date]);
@@ -38,6 +42,7 @@ function BookingCalendar({ date, setDate, bookings, loading }) {
         onSelect={onSelect}
         onPanelChange={onPanelChange}
         fullscreen={isFullscreen}
+        disabledDate={disabledDate}
       />
 
       <style>
