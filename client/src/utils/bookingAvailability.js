@@ -1,0 +1,68 @@
+import dayjs from "dayjs";
+
+const APPROVED_STATUS_ID = 2;
+
+export function getApprovedBookings(bookings) {
+  if (!Array.isArray(bookings)) return [];
+  return bookings.filter(
+    (b) =>
+      Number(b?.status_id) === APPROVED_STATUS_ID ||
+      b?.booking_status === "approved",
+  );
+}
+
+function timeRangesOverlap(startA, endA, startB, endB) {
+  return dayjs(startA).isBefore(endB) && dayjs(endA).isAfter(startB);
+}
+
+export function getApprovedBookingsForRoomOnDate(bookings, dateStr, roomId) {
+  const approved = getApprovedBookings(bookings);
+  return approved.filter((b) => {
+    const bookingDateRaw = b.booking_date ?? b.start_dateTime;
+    const bookingDate = bookingDateRaw
+      ? dayjs(bookingDateRaw).format("YYYY-MM-DD")
+      : "";
+    if (bookingDate !== dateStr) return false;
+    if (roomId != null && Number(b.room_id) !== Number(roomId)) return false;
+    return true;
+  });
+}
+
+export function isTimeRangeBooked(
+  approvedBookings,
+  dateStr,
+  startTime,
+  endTime,
+) {
+  const rangeStart = dayjs(`${dateStr} ${startTime}`, "YYYY-MM-DD HH:mm");
+  const rangeEnd = dayjs(`${dateStr} ${endTime}`, "YYYY-MM-DD HH:mm");
+
+  return approvedBookings.some((b) => {
+    const start = dayjs(b.start_dateTime);
+    const end = dayjs(b.end_dateTime);
+    return timeRangesOverlap(rangeStart, rangeEnd, start, end);
+  });
+}
+
+export function isSlotBooked(approvedBookings, dateStr, slotStart, slotEnd) {
+  return isTimeRangeBooked(approvedBookings, dateStr, slotStart, slotEnd);
+}
+
+export function getRoomIdsBookedInRange(bookings, dateStr, startTime, endTime) {
+  const approved = getApprovedBookingsForRoomOnDate(
+    bookings,
+    dateStr,
+    undefined,
+  );
+  const booked = new Set();
+  const rangeStart = dayjs(`${dateStr} ${startTime}`, "YYYY-MM-DD HH:mm");
+  const rangeEnd = dayjs(`${dateStr} ${endTime}`, "YYYY-MM-DD HH:mm");
+  approved.forEach((b) => {
+    const start = dayjs(b.start_dateTime);
+    const end = dayjs(b.end_dateTime);
+    if (timeRangesOverlap(rangeStart, rangeEnd, start, end)) {
+      booked.add(Number(b.room_id));
+    }
+  });
+  return booked;
+}
