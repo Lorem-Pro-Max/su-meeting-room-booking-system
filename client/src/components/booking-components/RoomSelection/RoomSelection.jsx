@@ -1,8 +1,10 @@
-import { Modal, Form, Button } from "antd";
-import { useEffect, useState } from "react";
+import { Modal, Form } from "antd";
+import { useEffect, useMemo, useState } from "react";
+import dayjs from "dayjs";
 import RoomPickerCard from "./RoomPickerCard";
 import RoomsByFloorTabs from "./RoomByFloorTabs";
 import useRoomByFloor from "./useRoomByFloor";
+import { getRoomIdsBookedInRange } from "../../../utils/bookingAvailability";
 
 export default function RoomSelection({
   isModalOpen,
@@ -10,10 +12,25 @@ export default function RoomSelection({
   setFormData,
   formData,
   rooms,
+  bookings = [],
+  selectedDate,
 }) {
   const [tempSelectedRoom, setTempSelectedRoom] = useState(null);
 
   const roomsGroupedByFloor = useRoomByFloor(rooms);
+
+  const dateStr = selectedDate ? dayjs(selectedDate).format("YYYY-MM-DD") : "";
+  const disabledRoomIds = useMemo(() => {
+    if (!dateStr || !formData.startTime || !formData.endTime) return new Set();
+    return getRoomIdsBookedInRange(
+      bookings,
+      dateStr,
+      formData.startTime,
+      formData.endTime
+    );
+  }, [bookings, dateStr, formData.startTime, formData.endTime]);
+
+  const isTempSelectedRoomDisabled = tempSelectedRoom && disabledRoomIds.has(Number(tempSelectedRoom.id));
 
   useEffect(() => {
     if (isModalOpen) { setTempSelectedRoom(formData.room ?? null); }
@@ -39,6 +56,7 @@ export default function RoomSelection({
           roomsGroupedByFloor={roomsGroupedByFloor}
           tempSelectedRoom={tempSelectedRoom}
           onSelectTempRoom={setTempSelectedRoom}
+          disabledRoomIds={disabledRoomIds}
         />
         <div className="w-full flex flex-col sm:flex-row gap-2 pt-5">
           <button
@@ -48,10 +66,10 @@ export default function RoomSelection({
             ยกเลิก
           </button>
           <button
-            disabled={!tempSelectedRoom}
-            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom ? "bg-mint-dark hover:bg-mint-darker text-white! cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
+            disabled={!tempSelectedRoom || isTempSelectedRoomDisabled}
+            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom && !isTempSelectedRoomDisabled ? "bg-mint-dark hover:bg-mint-darker text-white! cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
             onClick={() => {
-              if (tempSelectedRoom) {
+              if (tempSelectedRoom && !isTempSelectedRoomDisabled) {
                 setIsModalOpen(false);
                 setFormData((prev) => ({ ...prev, room: tempSelectedRoom }));
               }

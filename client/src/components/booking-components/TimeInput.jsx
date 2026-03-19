@@ -2,14 +2,19 @@ import { Form, Select, Checkbox, } from "antd";
 import { CalendarOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { getApprovedBookingsForRoomOnDate, isSlotBooked } from "../../utils/bookingAvailability";
 
 dayjs.extend(isSameOrBefore);
 
-function TimeInput({ setFormData, date }) {
+function TimeInput({ setFormData, date, bookings = [], selectedRoom }) {
     const selectedDate = date ? dayjs(date) : null;
     const now = dayjs();
+    const dateStr = selectedDate ? selectedDate.format("YYYY-MM-DD") : "";
+    const approvedForRoom = selectedRoom
+        ? getApprovedBookingsForRoomOnDate(bookings, dateStr, selectedRoom.id)
+        : [];
 
-    const timeSlots = generateTimeSlots(selectedDate, now);
+    const timeSlots = generateTimeSlots(selectedDate, now, dateStr, approvedForRoom);
 
     const form = Form.useFormInstance();
     const selectedTimes = Form.useWatch("time", form) || [];
@@ -83,8 +88,8 @@ function TimeInput({ setFormData, date }) {
                             return (
                                 <div
                                     key={time.value}
-                                    onClick={() => handleSelect(time.value)}
-                                    className={`flex items-center p-2 rounded-lg hover:bg-teal-50 transition-colors`}
+                                    onClick={() => !time.disabled && handleSelect(time.value)}
+                                    className={`flex items-center p-2 rounded-lg transition-colors ${time.disabled ? "opacity-60 cursor-not-allowed" : "hover:bg-teal-50 cursor-pointer"}`}
                                 >
                                     <Checkbox
                                         checked={isSelected}
@@ -107,7 +112,7 @@ function TimeInput({ setFormData, date }) {
 
 export default TimeInput
 
-const generateTimeSlots = (selectedDate, now) => {
+const generateTimeSlots = (selectedDate, now, dateStr, approvedBookingsForRoom) => {
     const slots = [];
 
     let start = dayjs().hour(8).minute(0);
@@ -115,6 +120,8 @@ const generateTimeSlots = (selectedDate, now) => {
 
     while (start.isBefore(endLimit)) {
         const next = start.add(30, "minute");
+        const slotStart = start.format("HH:mm");
+        const slotEnd = next.format("HH:mm");
 
         let isDisabled = false;
 
@@ -124,11 +131,17 @@ const generateTimeSlots = (selectedDate, now) => {
             }
         }
 
+        if (!isDisabled && dateStr && approvedBookingsForRoom?.length > 0) {
+            if (isSlotBooked(approvedBookingsForRoom, dateStr, slotStart, slotEnd)) {
+                isDisabled = true;
+            }
+        }
+
         slots.push({
-            value: start.format("HH:mm"),
-            label: `${start.format("HH:mm")} - ${next.format("HH:mm")} น.`,
-            start: start.format("HH:mm"),
-            end: next.format("HH:mm"),
+            value: slotStart,
+            label: `${slotStart} - ${slotEnd} น.`,
+            start: slotStart,
+            end: slotEnd,
             disabled: isDisabled
         });
 
