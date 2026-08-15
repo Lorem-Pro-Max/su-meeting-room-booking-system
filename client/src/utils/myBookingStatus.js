@@ -27,6 +27,13 @@ export function isHistoryBooking(booking) {
   return finishedStatus.includes(booking?.booking_status);
 }
 
+export function getActionReason(booking) {
+  const status = booking?.booking_status;
+  if (status !== "rejectedByAdmin" && status !== "canceledByAdmin") return null;
+
+  return booking?.reason?.trim() || null;
+}
+
 export function getStatusBadge(status) {
   if (status === "pending")
     return { label: "รออนุมัติ", className: "bg-[#FA8C16] text-white" };

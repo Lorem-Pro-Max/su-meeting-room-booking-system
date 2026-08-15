@@ -47,6 +47,7 @@ export async function findMyBookings(requesterId) {
       rb.created_at,
       rb.status_id,
       rb.is_notified,
+      rb.reason,
       bs.status AS booking_status,
       u.firstname,
       u.lastname,
