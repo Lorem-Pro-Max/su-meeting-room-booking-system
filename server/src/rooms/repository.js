@@ -8,6 +8,8 @@ export async function findAllRooms() {
     room.floor,
     room.building_id,
     building.name AS building_name,
+    room.study_seats,
+    room.exam_seats,
     room.created_at
   FROM room
   LEFT JOIN building

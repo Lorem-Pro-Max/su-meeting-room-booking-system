@@ -1,4 +1,5 @@
 import Building from "../../assets/icon/building.svg";
+import RoomSeatInfo from "./RoomSelection/RoomSeatInfo";
 import dayjs from "dayjs"
 import { createBooking } from "../../services/createBooking"
 import { useNavigate } from "react-router-dom";
@@ -94,6 +95,10 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
                         <div className="flex flex-col justify-center">
                             <span>{formData?.room.title}</span>
                             <span>ชั้น {formData?.room.floor}</span>
+                            <RoomSeatInfo
+                                studySeats={formData?.room.study_seats}
+                                examSeats={formData?.room.exam_seats}
+                            />
                         </div>
                     </div>
                     <span>{formData?.room.building_name}</span>
