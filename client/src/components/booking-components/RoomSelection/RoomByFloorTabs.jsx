@@ -1,6 +1,6 @@
 
-import { Row, Tabs } from "antd";
-import { useMemo } from "react";
+import { Empty, Row, Tabs } from "antd";
+import { useMemo, useState } from "react";
 import RoomCard from "./RoomCard";
 
 
@@ -9,15 +9,15 @@ export default function RoomsByFloorTabs({
   tempSelectedRoom,
   onSelectTempRoom,
   disabledRoomIds = new Set(),
+  filterSlot = null,
+  hasActiveFilters = false,
 }) {
+  const [selectedFloorKey, setSelectedFloorKey] = useState(null);
+
   const floorTabItems = useMemo(() => {
     const sortedFloors = Array.from(roomsGroupedByFloor.keys()).sort(
       (firstFloorKey, secondFloorKey) => Number(firstFloorKey) - Number(secondFloorKey)
     );
-
-    if (!sortedFloors.length) {
-      return [{ key: "empty", label: "ไม่มีข้อมูล", children: <div>ไม่พบห้อง</div> }];
-    }
 
     return sortedFloors.map((floorKey) => {
       const roomsOnThisFloor = roomsGroupedByFloor.get(floorKey) ?? [];
@@ -45,10 +45,27 @@ export default function RoomsByFloorTabs({
     });
   }, [roomsGroupedByFloor, tempSelectedRoom, onSelectTempRoom, disabledRoomIds]);
 
+  const isSelectedFloorAvailable = floorTabItems.some((tabItem) => tabItem.key === selectedFloorKey);
+  const activeFloorKey = isSelectedFloorAvailable ? selectedFloorKey : floorTabItems[0]?.key;
+
+  if (!floorTabItems.length) {
+    return (
+      <div className="p-4 bg-[#F5F5F5] rounded-2xl">
+        <div className="flex justify-end pb-2">{filterSlot}</div>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={hasActiveFilters ? "ไม่พบห้องที่ตรงกับตัวกรอง" : "ไม่พบห้อง"}
+        />
+      </div>
+    );
+  }
+
   return (
     <Tabs
-      defaultActiveKey={floorTabItems[0]?.key ?? "1"}
+      activeKey={activeFloorKey}
+      onChange={setSelectedFloorKey}
       items={floorTabItems}
+      tabBarExtraContent={{ right: filterSlot }}
       indicator={{ size: (origin) => origin - 20 }}
     />)
 }
