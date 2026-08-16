@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { useState, useEffect } from "react";
 import { getAllRooms, getBookingOnDate } from "../services";
 
-import { Spin } from "antd";
+import { Spin, message } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
 export default function Booking() {
