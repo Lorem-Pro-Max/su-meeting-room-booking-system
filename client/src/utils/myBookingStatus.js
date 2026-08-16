@@ -31,7 +31,7 @@ export function getActionReason(booking) {
   const status = booking?.booking_status;
   if (status !== "rejectedByAdmin" && status !== "canceledByAdmin") return null;
 
-  return booking?.reason?.trim() || null;
+  return booking?.approval_reason?.trim() || null;
 }
 
 export function getStatusBadge(status) {

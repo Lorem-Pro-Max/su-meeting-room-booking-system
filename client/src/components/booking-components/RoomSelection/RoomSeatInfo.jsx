@@ -6,7 +6,6 @@ function SeatIcon({ className }) {
     );
 }
 
-/* null/undefined = ยังไม่ระบุจำนวนที่นั่ง, 0 = ห้องนี้ไม่รองรับการใช้งานรูปแบบนั้น */
 function SeatValue({ seats }) {
     if (seats === null || seats === undefined) {
         return <span className="text-gray-400">-</span>;

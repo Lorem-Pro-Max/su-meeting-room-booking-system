@@ -48,7 +48,7 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
             ? "ไม่สามารถเปิดห้องได้เนื่องจากเลยเวลาการจองแล้ว"
             : "";
 
-    const handleUpdateBookingStatus = async (statusId, reason = null) => {
+    const handleUpdateBookingStatus = async (statusId) => {
         try {
             setLoading(true);
 
@@ -56,7 +56,6 @@ function MyBookingCardFooter({ booking, mode, setLoading, user, fetchMyBookings 
                 bookingId: booking.id,
                 statusId: statusId,
                 actionBy: user.id,
-                reason: reason,
             });
 
             await fetchMyBookings();

@@ -19,6 +19,8 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
                 phone,
                 startTime,
                 endTime,
+                bookingTypeId,
+                purpose,
             } = form;
 
             const booking_date = dayjs(selectedDate).format("YYYY-MM-DD");
@@ -45,6 +47,8 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
                 booking_date,
                 start_dateTime,
                 end_dateTime,
+                booking_type_id: bookingTypeId,
+                purpose: purpose?.trim() || null,
             };
 
             const result = await createBooking(payload);
@@ -67,7 +71,7 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
             setLoading(false)
             notification.error({
                 message: 'ส่งคำขอการจองห้องไม่สำเร็จ',
-                description: 'กรุณาลองหใม่อีกครั้ง หรือติดต่อเจ้าหน้าที่',
+                description: err.response?.data?.error ?? 'กรุณาลองหใม่อีกครั้ง หรือติดต่อเจ้าหน้าที่',
                 placement: 'topRight',
                 duration: 4,
                 style: {
@@ -126,14 +130,21 @@ export function SubmitModalBody({ formData, setIsSubmitModalOpen, setLoading }) 
                         {formData?.startTime} - {formData?.endTime}
                     </p>
                 </div>
+
+                <div>
+                    <p className="text-sm text-gray-500">ประเภทการจอง</p>
+                    <p className="text-base text-gray-900 font-semibold">{formData?.bookingTypeName || "-"}</p>
+                </div>
+
+                <div>
+                    <p className="text-sm text-gray-500">เหตุผลการจอง</p>
+                    <p className="text-base text-gray-900 font-semibold whitespace-pre-wrap">{formData?.purpose?.trim() || "-"}</p>
+                </div>
             </div>
             <div className="w-full flex flex-col gap-2">
                 <button
                     className="w-full rounded-lg bg-mint-dark py-2 text-white! hover:cursor-pointer"
-                    onClick={async () => {
-                        await handleSubmit(formData)
-                        navigate("/my-booking")
-                    }}>
+                    onClick={() => handleSubmit(formData)}>
                     ยืนยันการจอง
                 </button>
                 <button className="w-full rounded-lg border border-[#D9D9D9] py-2 text-white hover:cursor-pointer" onClick={() => { setIsSubmitModalOpen(false) }}>แก้ไขข้อมูลการจอง</button>

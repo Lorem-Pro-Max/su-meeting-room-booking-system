@@ -1,12 +1,14 @@
 import { Form, Input, DatePicker, Row, Col, Divider, ConfigProvider, Modal, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import dayjs from 'dayjs';
 import RoomSelection from "./RoomSelection/RoomSelection"
-import { getRoomIdsBookedInRange } from "../../utils/bookingAvailability";
+import { getConflictingApprovedBookings } from "../../utils/bookingAvailability";
 import TitleInput from "./TitleInput";
 import TimeInput from "./TimeInput";
+import BookingTypeInput from "./BookingTypeInput";
+import PurposeInput from "./PurposeInput";
 import BookingCard from "./BookingModal/BookingCard";
 import PhoneInput from "./PhoneInput";
 import { SubmitModalBody } from "./SubmitModalBody";
@@ -24,18 +26,18 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
     selectedDate: date,
     phone: "",
     startTime: null,
-    endTime: null
+    endTime: null,
+    bookingTypeId: null,
+    bookingTypeName: null,
+    purpose: ""
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false)
 
 
   const dateStr = date ? dayjs(date).format("YYYY-MM-DD") : "";
-  const disabledRoomIds = useMemo(() => {
-    if (!dateStr || !formData.startTime || !formData.endTime) return new Set();
-    return getRoomIdsBookedInRange(bookings, dateStr, formData.startTime, formData.endTime);
-  }, [bookings, dateStr, formData.startTime, formData.endTime]);
 
   useEffect(() => {
     if (date) {
@@ -44,25 +46,42 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
     }
   }, [date]);
 
-  useEffect(() => {
-    if (formData.room && disabledRoomIds.has(Number(formData.room.id))) {
-      setFormData((prev) => ({ ...prev, room: null }));
-    }
-  }, [disabledRoomIds]);
-
   const preSubmitCheck = async () => {
     try {
       await form.validateFields();
 
       if (!formData.startTime || !formData.endTime || !formData.room) {
-        setIsErrorModalOpen(true);
+        openErrorModal();
+        return;
+      }
+
+      if (formData.endTime <= formData.startTime) {
+        openErrorModal(`เวลาสิ้นสุด (${formData.endTime}) ต้องมากกว่าเวลาเริ่ม (${formData.startTime}) กรุณาแก้ไขช่วงเวลาที่จอง`);
+        return;
+      }
+
+      const conflicts = getConflictingApprovedBookings(
+        bookings,
+        dateStr,
+        formData.room.id,
+        formData.startTime,
+        formData.endTime
+      );
+
+      if (conflicts.length > 0) {
+        openErrorModal(`ห้อง ${formData.room.title} ถูกจองแล้วในช่วงเวลาที่เลือก กรุณาเลือกเวลาอื่นหรือเปลี่ยนห้อง`);
         return;
       }
 
       setIsSubmitModalOpen(true);
     } catch (error) {
-      setIsErrorModalOpen(true);
+      openErrorModal();
     }
+  };
+
+  const openErrorModal = (message = null) => {
+    setErrorMessage(message);
+    setIsErrorModalOpen(true);
   };
 
   return (
@@ -101,6 +120,8 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
               </Col>
             </Row>
             <TimeInput setFormData={setFormData} date={date} bookings={bookings} selectedRoom={formData.room} />
+            <BookingTypeInput setFormData={setFormData} />
+            <PurposeInput setFormData={setFormData} />
           </Form>
         </ConfigProvider>
         <Divider></Divider>
@@ -125,7 +146,6 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
       <Modal
         title="รายละเอียดการจอง"
         open={isSubmitModalOpen}
-        onOk={() => toggleModal(0, false)}
         onCancel={() => setIsSubmitModalOpen(false)}
         centered
         footer={null}
@@ -135,8 +155,14 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
       <Modal title={null} open={isErrorModalOpen} onCancel={() => setIsErrorModalOpen(false)} centered footer={null}>
         <div className="flex flex-col items-center">
           <img src={ModalImage} />
-          <p>กรุณากรอกข้อมูลให้ครบถ้วน  </p>
-          <p>โปรดตรวจสอบและระบุข้อมูลให้ครบถ้วนก่อนกดยืนยัน </p>
+          {errorMessage ? (
+            <p className="text-center">{errorMessage}</p>
+          ) : (
+            <>
+              <p>กรุณากรอกข้อมูลให้ครบถ้วน  </p>
+              <p>โปรดตรวจสอบและระบุข้อมูลให้ครบถ้วนก่อนกดยืนยัน </p>
+            </>
+          )}
           <button className="w-full rounded-lg border border-[#D9D9D9] py-2 text-white hover:cursor-pointer" onClick={() => { setIsErrorModalOpen(false) }}>ปิด</button>
         </div>
       </Modal>

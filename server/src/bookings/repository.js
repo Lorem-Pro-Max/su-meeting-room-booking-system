@@ -47,7 +47,8 @@ export async function findMyBookings(requesterId) {
       rb.created_at,
       rb.status_id,
       rb.is_notified,
-      rb.reason,
+      rb.purpose,
+      rb.approval_reason,
       bs.status AS booking_status,
       u.firstname,
       u.lastname,
@@ -66,7 +67,6 @@ export async function findMyBookings(requesterId) {
   `;
 }
 
-/* create booking */
 export async function insertBooking(data) {
   const [row] = await sql`
     INSERT INTO room_booking (
@@ -77,9 +77,11 @@ export async function insertBooking(data) {
       booking_date,
       "start_dateTime",
       "end_dateTime",
-      status_id
+      status_id,
+      booking_type_id,
+      purpose
     )
-    VALUES (
+    SELECT
       ${data.meeting_name},
       ${data.room_id},
       ${data.requester_id},
@@ -87,22 +89,38 @@ export async function insertBooking(data) {
       ${data.booking_date},
       ${data.start_dateTime},
       ${data.end_dateTime},
-      1 -- pending
+      1, -- pending
+      ${data.booking_type_id},
+      ${data.purpose}
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM room_booking
+      WHERE room_id = ${data.room_id}
+        AND status_id = 2
+        AND "start_dateTime" < ${data.end_dateTime}
+        AND "end_dateTime" > ${data.start_dateTime}
     )
     RETURNING *
   `;
   return row;
 }
 
+export async function findBookingTypes() {
+  return sql`
+    SELECT id, name
+    FROM booking_type
+    ORDER BY id ASC
+  `;
+}
+
 /* update status (admin / user) */
-export async function updateBookingStatus(id, statusId, actionBy, reason) {
+export async function updateBookingStatus(id, statusId, actionBy) {
   const [row] = await sql`
     UPDATE room_booking
     SET
       status_id = ${statusId},
       action_by = ${actionBy},
-      action_date = NOW(),
-      reason = ${reason}
+      action_date = NOW()
     WHERE id = ${id}
     RETURNING *
   `;
