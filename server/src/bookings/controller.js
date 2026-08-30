@@ -105,7 +105,7 @@ export async function createBooking(req, res) {
   }
 }
 
-/* cancel / checkin / admin update */
+/* cancel / admin update */
 export async function updateStatus(req, res) {
   try {
     const action_by = req.user.id;
