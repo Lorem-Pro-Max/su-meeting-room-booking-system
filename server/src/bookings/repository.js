@@ -113,6 +113,9 @@ export async function findBookingTypes() {
   `;
 }
 
+/* สถานะที่ยังมีสิทธิ์ใช้ห้อง: รออนุมัติ / อนุมัติแล้ว / ห้องเปิดแล้ว */
+const LIVE_STATUS_IDS = [1, 2, 5];
+
 /* update status (admin / user) */
 export async function updateBookingStatus(id, statusId, actionBy) {
   const [row] = await sql`
@@ -124,7 +127,23 @@ export async function updateBookingStatus(id, statusId, actionBy) {
     WHERE id = ${id}
     RETURNING *
   `;
+
+  // ยกเลิกจองแล้วห้องต้องไม่เปิดเองตามเวลา
+  // worker ฝั่ง admin เช็ค record_status ก่อนสั่งงานทุกครั้ง จึงยกเลิกผ่าน DB ได้เลย
+  if (row && !LIVE_STATUS_IDS.includes(Number(statusId))) {
+    await cancelBookingSchedules(id);
+  }
+
   return row;
+}
+
+async function cancelBookingSchedules(bookingId) {
+  return sql`
+    UPDATE iot_schedule
+    SET record_status = 'canceled'
+    WHERE booking_id = ${bookingId}
+      AND record_status = 'pending'
+  `;
 }
 
 export async function updateBookingNotiStatus(id, status, userId) {
