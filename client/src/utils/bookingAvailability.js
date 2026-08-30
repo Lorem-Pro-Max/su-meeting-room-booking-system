@@ -28,24 +28,26 @@ export function getApprovedBookingsForRoomOnDate(bookings, dateStr, roomId) {
   });
 }
 
-export function isTimeRangeBooked(
-  approvedBookings,
+export function getConflictingApprovedBookings(
+  bookings,
   dateStr,
+  roomId,
   startTime,
   endTime,
 ) {
+  if (!dateStr || roomId == null || !startTime || !endTime) return [];
+
   const rangeStart = dayjs(`${dateStr} ${startTime}`, "YYYY-MM-DD HH:mm");
   const rangeEnd = dayjs(`${dateStr} ${endTime}`, "YYYY-MM-DD HH:mm");
 
-  return approvedBookings.some((b) => {
-    const start = dayjs(b.start_dateTime);
-    const end = dayjs(b.end_dateTime);
-    return timeRangesOverlap(rangeStart, rangeEnd, start, end);
-  });
-}
-
-export function isSlotBooked(approvedBookings, dateStr, slotStart, slotEnd) {
-  return isTimeRangeBooked(approvedBookings, dateStr, slotStart, slotEnd);
+  return getApprovedBookingsForRoomOnDate(bookings, dateStr, roomId).filter((b) =>
+    timeRangesOverlap(
+      rangeStart,
+      rangeEnd,
+      dayjs(b.start_dateTime),
+      dayjs(b.end_dateTime),
+    ),
+  );
 }
 
 export function getRoomIdsBookedInRange(bookings, dateStr, startTime, endTime) {

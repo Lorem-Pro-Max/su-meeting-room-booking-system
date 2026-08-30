@@ -5,7 +5,6 @@ import "dotenv/config";
 import roomRouter from "./rooms/route.js";
 import bookingRouter from "./bookings/route.js";
 import authRoute from "./auth/route.js";
-import iotRoute from "./iot/route.js";
 import { authenticate } from "./middleware/authMiddleware.js";
 
 const app = express();
@@ -33,6 +32,5 @@ app.use("/auth", authRoute);
 
 app.use("/rooms", authenticate, roomRouter);
 app.use("/booking", authenticate, bookingRouter);
-app.use("/iot", authenticate, iotRoute);
 
 export default app;

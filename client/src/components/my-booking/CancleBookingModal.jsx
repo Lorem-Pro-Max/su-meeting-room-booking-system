@@ -26,7 +26,7 @@ function CancelBookingModal({ isModalOpen, setIsModalOpen, handleUpdateBookingSt
                     <button
 
                         className="w-full sm:w-1/2 rounded-lg h-10 transition bg-[#F5222D] hover:bg-[#A8071A] text-white! cursor-pointer"
-                        onClick={() => handleUpdateBookingStatus(7, "ยกเลิกโดยผู้ใช้งาน")}
+                        onClick={() => handleUpdateBookingStatus(7)}
                     >
                         ยืนยัน
                     </button>

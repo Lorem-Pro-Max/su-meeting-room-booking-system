@@ -3,7 +3,7 @@ export const getCurrentUser = () => {
   if (savedUser) {
     try {
       return JSON.parse(savedUser);
-    } catch (e) {
+    } catch {
       return null;
     }
   }

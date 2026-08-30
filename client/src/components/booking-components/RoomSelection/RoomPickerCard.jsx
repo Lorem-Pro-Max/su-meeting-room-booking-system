@@ -1,5 +1,6 @@
 import { PlusOutlined, CheckCircleFilled } from "@ant-design/icons";
 import BuildingIcon from "../../../assets/icon/building.svg"
+import RoomSeatInfo from "./RoomSeatInfo";
 
 export default function RoomPickerCard({ rooms, formData, onOpenModal }) {
   const selectedRoomName = formData.room?.title
@@ -20,9 +21,15 @@ export default function RoomPickerCard({ rooms, formData, onOpenModal }) {
           <PlusOutlined className="text-xl" />
         )}
       </div>
-      <div className="flex flex-col">
+      <div className="flex flex-col min-w-0">
         <span className="text-start">{selectedRoomName || "เลือกห้องเรียน/ห้องประชุม"}</span>
         <span className={`text-start ${formData.room ? "" : "hidden"}`} > ชั้น {selectedFloor || null}</span>
+        {formData.room ? (
+          <RoomSeatInfo
+            studySeats={formData.room.study_seats}
+            examSeats={formData.room.exam_seats}
+          />
+        ) : null}
         <span className="m-0 text-start text-xs text-gray-600 font-normal">{rooms?.[0]?.building_name}</span>
       </div>
     </button >

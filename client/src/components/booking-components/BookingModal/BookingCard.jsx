@@ -1,6 +1,7 @@
 import { Card, Space, Typography, Tag, Flex, Row, Col } from 'antd';
 import { ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { getStatusDetails } from '../../../utils/myBookingStatus';
 
 const { Text, Title } = Typography;
 
@@ -52,16 +53,3 @@ function BookingCard({ bookings }) {
     );
 }
 export default BookingCard;
-
-const getStatusDetails = (status) => {
-    const statusMap = {
-        pending: { label: "รออนุมัติ", color: "warning", display: true },
-        approved: { label: "จองสำเร็จ", color: "success", display: true },
-        rejectedByAdmin: { label: "ปฏิเสธ", color: "error", display: false },
-        canceledByAdmin: { label: "ยกเลิก", color: "default", display: false },
-        "checked-in": { label: "เช็คอินแล้ว", color: "processing", display: true },
-        completed: { label: "เสร็จสิ้น", color: "blue", display: true },
-        canceledByUser: { label: "ยกเลิก", color: "default", display: false },
-    };
-    return statusMap[status] || { label: "ไม่ทราบสถานะ", color: "default", display: false };
-};

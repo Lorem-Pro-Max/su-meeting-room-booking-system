@@ -3,8 +3,27 @@ import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import RoomPickerCard from "./RoomPickerCard";
 import RoomsByFloorTabs from "./RoomByFloorTabs";
+import RoomFilter from "./RoomFilter";
 import useRoomByFloor from "./useRoomByFloor";
-import { getRoomIdsBookedInRange } from "../../../utils/bookingAvailability";
+import {
+  getConflictingApprovedBookings,
+  getRoomIdsBookedInRange,
+} from "../../../utils/bookingAvailability";
+import getBookingOnDate from "../../../services/getBookingOnDate";
+
+const EMPTY_FILTERS = {
+  minStudySeats: null,
+  minExamSeats: null,
+  date: null,
+  startTime: null,
+  endTime: null,
+};
+
+function matchesSeatFilters(roomItem, { minStudySeats, minExamSeats }) {
+  if (minStudySeats && !(roomItem.study_seats >= minStudySeats)) return false;
+  if (minExamSeats && !(roomItem.exam_seats >= minExamSeats)) return false;
+  return true;
+}
 
 export default function RoomSelection({
   isModalOpen,
@@ -16,10 +35,65 @@ export default function RoomSelection({
   selectedDate,
 }) {
   const [tempSelectedRoom, setTempSelectedRoom] = useState(null);
-
-  const roomsGroupedByFloor = useRoomByFloor(rooms);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [bookingsOnFilterDate, setBookingsOnFilterDate] = useState({ dateStr: "", data: [] });
 
   const dateStr = selectedDate ? dayjs(selectedDate).format("YYYY-MM-DD") : "";
+  const filterDateStr = filters.date ? dayjs(filters.date).format("YYYY-MM-DD") : "";
+  const isFilterDateSameAsForm = Boolean(filterDateStr) && filterDateStr === dateStr;
+
+  useEffect(() => {
+    if (!filterDateStr || isFilterDateSameAsForm) return;
+
+    let isCurrentRequest = true;
+
+    getBookingOnDate(filterDateStr)
+      .then((data) => {
+        if (isCurrentRequest) setBookingsOnFilterDate({ dateStr: filterDateStr, data });
+      })
+      .catch(() => {
+        if (isCurrentRequest) setBookingsOnFilterDate({ dateStr: filterDateStr, data: [] });
+      });
+
+    return () => { isCurrentRequest = false; };
+  }, [filterDateStr, isFilterDateSameAsForm]);
+
+  const bookingsForFilter = isFilterDateSameAsForm
+    ? bookings
+    : bookingsOnFilterDate.dateStr === filterDateStr
+      ? bookingsOnFilterDate.data
+      : null;
+
+  const filteredRooms = useMemo(() => {
+    const { startTime, endTime } = filters;
+    const shouldFilterByTime = Boolean(filterDateStr && startTime && endTime && bookingsForFilter);
+
+    return (rooms ?? []).filter((roomItem) => {
+      if (!matchesSeatFilters(roomItem, filters)) return false;
+
+      if (shouldFilterByTime) {
+        const conflicts = getConflictingApprovedBookings(
+          bookingsForFilter,
+          filterDateStr,
+          roomItem.id,
+          startTime,
+          endTime
+        );
+        if (conflicts.length > 0) return false;
+      }
+
+      return true;
+    });
+  }, [rooms, filters, filterDateStr, bookingsForFilter]);
+
+  const roomsGroupedByFloor = useRoomByFloor(filteredRooms);
+
+  const activeFilterCount =
+    (filters.minStudySeats ? 1 : 0) +
+    (filters.minExamSeats ? 1 : 0) +
+    (filters.startTime && filters.endTime ? 1 : 0);
+
   const disabledRoomIds = useMemo(() => {
     if (!dateStr || !formData.startTime || !formData.endTime) return new Set();
     return getRoomIdsBookedInRange(
@@ -30,7 +104,14 @@ export default function RoomSelection({
     );
   }, [bookings, dateStr, formData.startTime, formData.endTime]);
 
-  const isTempSelectedRoomDisabled = tempSelectedRoom && disabledRoomIds.has(Number(tempSelectedRoom.id));
+  const selectedRoom = filteredRooms.some(
+    (roomItem) => Number(roomItem.id) === Number(tempSelectedRoom?.id)
+  )
+    ? tempSelectedRoom
+    : null;
+
+  const isSelectedRoomDisabled = selectedRoom && disabledRoomIds.has(Number(selectedRoom.id));
+  const canConfirmRoom = Boolean(selectedRoom) && !isSelectedRoomDisabled;
 
   useEffect(() => {
     if (isModalOpen) { setTempSelectedRoom(formData.room ?? null); }
@@ -54,9 +135,20 @@ export default function RoomSelection({
       >
         <RoomsByFloorTabs
           roomsGroupedByFloor={roomsGroupedByFloor}
-          tempSelectedRoom={tempSelectedRoom}
+          tempSelectedRoom={selectedRoom}
           onSelectTempRoom={setTempSelectedRoom}
           disabledRoomIds={disabledRoomIds}
+          hasActiveFilters={activeFilterCount > 0}
+          filterSlot={
+            <RoomFilter
+              filters={filters}
+              onChangeFilters={setFilters}
+              activeFilterCount={activeFilterCount}
+              formDate={selectedDate}
+              isOpen={isFilterOpen}
+              setIsOpen={setIsFilterOpen}
+            />
+          }
         />
         <div className="w-full flex flex-col sm:flex-row gap-2 pt-5">
           <button
@@ -66,12 +158,12 @@ export default function RoomSelection({
             ยกเลิก
           </button>
           <button
-            disabled={!tempSelectedRoom || isTempSelectedRoomDisabled}
-            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${tempSelectedRoom && !isTempSelectedRoomDisabled ? "bg-mint-dark hover:bg-mint-darker text-white! cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
+            disabled={!canConfirmRoom}
+            className={`w-full sm:w-1/2 rounded-lg h-10 transition ${canConfirmRoom ? "bg-mint-dark hover:bg-mint-darker text-white! cursor-pointer" : "bg-gray-300 cursor-not-allowed text-white"}`}
             onClick={() => {
-              if (tempSelectedRoom && !isTempSelectedRoomDisabled) {
+              if (canConfirmRoom) {
                 setIsModalOpen(false);
-                setFormData((prev) => ({ ...prev, room: tempSelectedRoom }));
+                setFormData((prev) => ({ ...prev, room: selectedRoom }));
               }
             }}
           >
