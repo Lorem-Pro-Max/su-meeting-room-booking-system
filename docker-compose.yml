@@ -1,4 +1,10 @@
-version: "3.8"
+# ตรึง subnet ไว้ เพื่อให้ gateway เป็น 172.21.0.1 เสมอ
+# (ใช้ใน DATABASE_URL และต้องเปิดสิทธิ์ใน ufw + pg_hba.conf ให้ subnet นี้)
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
 
 services:
   # Backend API
