@@ -2,6 +2,7 @@ import { Calendar, ConfigProvider, Grid } from "antd";
 import { useState, useEffect } from "react";
 import BookingListModal from "./BookingModal/BookingListModal";
 import { useBuildingAvailability } from "../../hooks/booking";
+import { getAvailabilityColor } from "../../utils/bookingAvailability";
 import dayjs from "dayjs";
 
 function BookingCalendar({ date, setDate, bookings, loading }) {
@@ -34,8 +35,30 @@ function BookingCalendar({ date, setDate, bookings, loading }) {
     if (date) { fetchAvailability(date); }
   }, [date]);
 
+  const fullCellRender = (current, info) => {
+    const isDate = info.type === "date";
+    const isToday = current.isSame(dayjs(), isDate ? "day" : "month");
+    const color =
+      isDate && !disabledDate(current)
+        ? getAvailabilityColor(availabilityMap?.[current.format("YYYY-MM-DD")])
+        : "";
+
+    return (
+      <div
+        className={`ant-picker-cell-inner ant-picker-calendar-date${isToday ? " ant-picker-calendar-date-today" : ""}`}
+      >
+        <div
+          className={`ant-picker-calendar-date-value${color ? ` ${color} !text-white` : ""}`}
+        >
+          {isDate ? current.format("DD") : current.format("MMM")}
+        </div>
+        <div className="ant-picker-calendar-date-content" />
+      </div>
+    );
+  };
+
   return (<>
-    <div className="w-full p-5 h-full">
+    <div className="w-full p-5 h-full sm:min-h-0 sm:overflow-y-auto">
 
       <Calendar
         value={date}
@@ -43,18 +66,18 @@ function BookingCalendar({ date, setDate, bookings, loading }) {
         onPanelChange={onPanelChange}
         fullscreen={isFullscreen}
         disabledDate={disabledDate}
+        fullCellRender={fullCellRender}
       />
 
       <style>
         {`
-        .ant-picker-calendar-full .ant-picker-calendar-date-value {
+        .ant-picker-calendar-date-value {
           display: inline-block;
           width: 24px;
           height: 24px;
           line-height: 24px;
           text-align: center;
           border-radius: 50%;
-          background: var(--avail-color); /* default เขียว ถ้าไม่มีข้อมูล */
         }
       `}
       </style>

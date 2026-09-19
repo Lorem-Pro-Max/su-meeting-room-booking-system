@@ -41,7 +41,7 @@ export default function Booking() {
     <>
       <Spin spinning={loading} indicator={<LoadingOutlined spin />} size="large" tip="Loading" fullscreen />
       <div className="flex flex-col sm:flex-row h-full">
-        <div className="flex flex-col gap-5 h-full w-full">
+        <div className="flex flex-col gap-5 h-full w-full sm:min-h-0">
           <BookingHeader />
           <BookingCalendar date={date} setDate={setDate} bookings={bookings} loading={loading} />
         </div>
