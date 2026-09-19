@@ -86,7 +86,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
 
   return (
     <div className="flex flex-col justify-between md:min-w-116 bg-white h-full">
-      <div className="p-5 bg-white">
+      <div className="p-5 bg-white sm:min-h-0 sm:overflow-y-auto">
         <ConfigProvider
           theme={{
             components: {
@@ -129,7 +129,7 @@ function BookingForm({ date, setDate, bookings, rooms, setLoading, loading }) {
         <div className="max-h-80 2xl:max-h-120 overflow-y-auto overflow-x-hidden space-y-4 px-2">
           <BookingCard bookings={bookings} /></div>
       </div>
-      <div>
+      <div className="shrink-0">
         <button
           className="w-full sm:w-1/2 h-10 border border-gray-300 text-gray-700 hover:bg-gray-100 transition hover:cursor-pointer"
           onClick={() => setIsModalOpen(false)}

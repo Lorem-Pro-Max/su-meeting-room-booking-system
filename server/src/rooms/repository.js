@@ -48,7 +48,7 @@ export async function findBuildingAvailabilityByDateRange(startDate, endDate) {
       FROM public.room_booking
       WHERE 
         booking_date BETWEEN ${startDate} AND ${endDate}
-        AND status_id NOT IN (3, 4) 
+        AND status_id IN (2, 5, 6)
       GROUP BY booking_date
     )
     SELECT
